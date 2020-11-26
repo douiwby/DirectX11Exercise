@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>0df6ff57-3168-49c7-b366-b659a2abc81a</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dds;dlg;fbx;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tga;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="InitGame">
+      <UniqueIdentifier>{ef01dc51-7d69-45aa-8863-a0e4d5a3fbf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BoxGame">
+      <UniqueIdentifier>{c77d4605-0c0c-4ef7-9bc9-59353591f71d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{c441f0a2-0fea-4592-966f-5e45f3a44953}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{c0e54da8-5538-4c29-a2de-0809f2577eda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CrateGame">
+      <UniqueIdentifier>{fb8a11aa-6f67-4064-a2d4-9b1d299882e2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="StepTimer.h" />
+    <ClInclude Include="InitGame\InitGame.h">
+      <Filter>InitGame</Filter>
+    </ClInclude>
+    <ClInclude Include="BoxGame\BoxGame.h">
+      <Filter>BoxGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\d3dUtil.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="CrateGame\CrateGame.h">
+      <Filter>CrateGame</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="InitGame\InitGame.cpp">
+      <Filter>InitGame</Filter>
+    </ClCompile>
+    <ClCompile Include="BoxGame\BoxGame.cpp">
+      <Filter>BoxGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\d3dUtil.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="CrateGame\CrateGame.cpp">
+      <Filter>CrateGame</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="directx.ico">
+      <Filter>Assets</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="settings.manifest">
+      <Filter>Assets</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\color.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
