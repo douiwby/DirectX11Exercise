@@ -6,9 +6,10 @@
 #include "Game.h"
 #include "InitGame/InitGame.h"
 #include "BoxGame/BoxGame.h"
+#include "CrateGame/CrateGame.h"
 
 using namespace DirectX;
-using TargetGame = BoxGame;
+using TargetGame = CrateGame;
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wcovered-switch-default"

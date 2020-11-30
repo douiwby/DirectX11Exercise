@@ -13,13 +13,13 @@ class BoxGame : public InitGame
 public:
 	using Super = InitGame;
 
-	void Initialize(HWND window, int width, int height);
+	virtual void Initialize(HWND window, int width, int height);
 
 protected:
 	virtual void Update(DX::StepTimer const& timer);
 	virtual void Render();
 
-	void SetInputLayout();
+	virtual void SetInputLayout();
 	void BuildBox();
 
 	Microsoft::WRL::ComPtr<ID3D11InputLayout>	m_inputLayout;
@@ -30,6 +30,8 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11Buffer>		m_constantBuffer;
 
 	UINT m_indexCount;
+
+	bool m_ShowWireframe = false;
 
 	DirectX::XMFLOAT4X4 m_world;
 	DirectX::XMFLOAT4X4 m_view;

@@ -53,8 +53,7 @@ void BoxGame::SetInputLayout()
 	m_d3dContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
 	m_d3dContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 
-	bool bShowWireframe = false;
-	if (bShowWireframe)
+	if (m_ShowWireframe)
 	{
 		CD3D11_RASTERIZER_DESC rsDesc(D3D11_DEFAULT);
 		rsDesc.FillMode = D3D11_FILL_WIREFRAME;
@@ -179,7 +178,7 @@ void BoxGame::Update(DX::StepTimer const& timer)
 
 	XMMATRIX mWorldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, view), proj);
 	XMFLOAT4X4 cbWorldViewProj;
-	XMStoreFloat4x4(&cbWorldViewProj, XMMatrixTranspose(mWorldViewProj));
+	XMStoreFloat4x4(&cbWorldViewProj, XMMatrixTranspose(mWorldViewProj)); // TODO: Understand why need XMMatrixTranspose here?
 
 	m_d3dContext->UpdateSubresource(m_constantBuffer.Get(), 0, nullptr, &cbWorldViewProj, 0, 0);
 }
