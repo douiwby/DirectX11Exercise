@@ -214,11 +214,11 @@ void InitGame::CreateResources()
 	{
 		// Create swap chain
 		ComPtr<IDXGIDevice> dxgiDevice;
-		m_d3dDevice->QueryInterface(__uuidof(IDXGIDevice), &dxgiDevice);
+		DX::ThrowIfFailed(m_d3dDevice->QueryInterface(__uuidof(IDXGIDevice), &dxgiDevice));
 		ComPtr<IDXGIAdapter> dxgiAdapter;
-		dxgiDevice->GetParent(__uuidof(IDXGIAdapter), &dxgiAdapter);
+		DX::ThrowIfFailed(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), &dxgiAdapter));
 		ComPtr<IDXGIFactory> dxgiFactory;
-		dxgiAdapter->GetParent(__uuidof(IDXGIFactory), &dxgiFactory);
+		DX::ThrowIfFailed(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), &dxgiFactory));
 
 		DXGI_SWAP_CHAIN_DESC scDesc;
 		scDesc.BufferDesc.Width = m_outputWidth;
@@ -406,7 +406,8 @@ void InitGame::ToggleWireframe()
 		rsDesc.CullMode = D3D11_CULL_NONE;
 	}
 	ComPtr<ID3D11RasterizerState> mRSState;
-	m_d3dDevice->CreateRasterizerState(&rsDesc, mRSState.GetAddressOf());
+	HRESULT hr = m_d3dDevice->CreateRasterizerState(&rsDesc, mRSState.GetAddressOf());
+	DX::ThrowIfFailed(hr);
 	m_d3dContext->RSSetState(mRSState.Get());
 }
 

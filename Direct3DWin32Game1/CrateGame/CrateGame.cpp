@@ -33,8 +33,10 @@ void CrateGame::SetInputLayout()
 	ComPtr<ID3DBlob> mvsByteCode = d3dUtil::CompileShader(L"CrateGame\\Crate.hlsl", nullptr, "VS", "vs_5_0");
 	ComPtr<ID3DBlob> mpsByteCode = d3dUtil::CompileShader(L"CrateGame\\Crate.hlsl", nullptr, "PS", "ps_5_0");
 
-	m_d3dDevice->CreateVertexShader(mvsByteCode->GetBufferPointer(), mvsByteCode->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
-	m_d3dDevice->CreatePixelShader(mpsByteCode->GetBufferPointer(), mpsByteCode->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
+	HRESULT hr = m_d3dDevice->CreateVertexShader(mvsByteCode->GetBufferPointer(), mvsByteCode->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+	hr = m_d3dDevice->CreatePixelShader(mpsByteCode->GetBufferPointer(), mpsByteCode->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
+	DX::ThrowIfFailed(hr);
 
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
@@ -43,7 +45,7 @@ void CrateGame::SetInputLayout()
 		{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,24,D3D11_INPUT_PER_VERTEX_DATA,0}
 	};
 
-	HRESULT hr = m_d3dDevice->CreateInputLayout(
+	hr = m_d3dDevice->CreateInputLayout(
 		vertexDesc,
 		ARRAYSIZE(vertexDesc),
 		mvsByteCode->GetBufferPointer(),
@@ -65,9 +67,9 @@ void CrateGame::BuildCrate()
 	{
 		// Front face
 		{ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.f,0.f) },
-		{ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.f,0.f) },
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.f,1.f) },
-		{ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.f,1.f) },
+		{ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(2.f,0.f) },
+		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.f,2.f) },
+		{ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(2.f,2.f) },
 		// Back face
 		{ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.f,0.f) },
 		{ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.f,0.f) },
@@ -175,20 +177,52 @@ void CrateGame::BuildCrate()
 	cbDesc.StructureByteStride = 0;
 
 	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBuffer.GetAddressOf());
+	DX::ThrowIfFailed(hr);
 
 	m_d3dContext->VSSetConstantBuffers(0, 1, m_constantBuffer.GetAddressOf());
 }
 
 void CrateGame::BuildTexture()
 {
-	CD3D11_SAMPLER_DESC samplerDesc;
-	ComPtr<ID3D11SamplerState> mSamplerState;
-	m_d3dDevice->CreateSamplerState(&samplerDesc, mSamplerState.GetAddressOf());
-	m_d3dContext->PSSetSamplers(0, 1, mSamplerState.GetAddressOf());
+	CD3D11_SAMPLER_DESC samplerDesc(D3D11_DEFAULT);
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	HRESULT hr = m_d3dDevice->CreateSamplerState(&samplerDesc, m_samplerState.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+	m_d3dContext->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
+	++currentSampler;
 
-	HRESULT hr = D3DX11CreateShaderResourceViewFromFile(
+	hr = D3DX11CreateShaderResourceViewFromFile(
 		m_d3dDevice.Get(), L"CrateGame\\WoodCrate01.dds", nullptr, nullptr, m_diffuseMapView.GetAddressOf(), nullptr);
 	DX::ThrowIfFailed(hr);
 
 	m_d3dContext->PSSetShaderResources(0, 1, m_diffuseMapView.GetAddressOf());
+}
+
+void CrateGame::ToggleSampler()
+{
+	CD3D11_SAMPLER_DESC samplerDesc(D3D11_DEFAULT);
+
+	switch (currentSampler%3)
+	{
+	case 0:
+		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		break;
+	case 1:
+		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+		break;
+	case 2:
+		samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		break;
+	}	
+
+	ComPtr<ID3D11SamplerState> mSamplerState;
+	HRESULT hr = m_d3dDevice->CreateSamplerState(&samplerDesc, m_samplerState.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+	m_d3dContext->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
+
+	++currentSampler;
 }

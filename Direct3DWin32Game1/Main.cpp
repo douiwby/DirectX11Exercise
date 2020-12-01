@@ -45,7 +45,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     if (FAILED(hr))
         return 1;
 
-	std::unique_ptr<TargetGame> g_game = std::make_unique<TargetGame>();
+	std::unique_ptr<InitGame> g_game = std::make_unique<TargetGame>();
 
     // Register class and create window
     {
@@ -121,7 +121,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static bool s_fullscreen = false;
     // TODO: Set s_fullscreen to true if defaulting to fullscreen.
 
-    auto game = reinterpret_cast<TargetGame*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+    auto game = reinterpret_cast<InitGame*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
     switch (message)
     {
@@ -284,6 +284,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (wParam == 0x47) // G key
 		{
 			game->ToggleAutoRotate();
+		}
+		if (wParam == 0x54) // T key
+		{
+			CrateGame* crateGame = dynamic_cast<CrateGame*>(game);
+			if (crateGame)
+			{
+				crateGame->ToggleSampler();
+				break;
+			}
 		}
 		else if (wParam == VK_ESCAPE)
 		{

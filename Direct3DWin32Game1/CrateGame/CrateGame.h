@@ -11,9 +11,11 @@ struct CrateGameVertex
 class CrateGame : public BoxGame
 {
 public:
-	using Super = InitGame;
+	using Super = BoxGame;
 
 	virtual void Initialize(HWND window, int width, int height);
+
+	virtual void ToggleSampler();
 
 protected:
 
@@ -21,5 +23,8 @@ protected:
 	void BuildCrate();
 	void BuildTexture();
 
+	int currentSampler = 0;
+
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_diffuseMapView;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
 };

@@ -17,8 +17,10 @@ void BoxGame::SetInputLayout()
 	ComPtr<ID3DBlob> mvsByteCode = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
 	ComPtr<ID3DBlob> mpsByteCode = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
 
-	m_d3dDevice->CreateVertexShader(mvsByteCode->GetBufferPointer(), mvsByteCode->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
-	m_d3dDevice->CreatePixelShader(mpsByteCode->GetBufferPointer(), mpsByteCode->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
+	HRESULT hr = m_d3dDevice->CreateVertexShader(mvsByteCode->GetBufferPointer(), mvsByteCode->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+	hr = m_d3dDevice->CreatePixelShader(mpsByteCode->GetBufferPointer(), mpsByteCode->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
+	DX::ThrowIfFailed(hr);
 
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
@@ -26,7 +28,7 @@ void BoxGame::SetInputLayout()
 		{"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0}
 	};
 
-	HRESULT hr = m_d3dDevice->CreateInputLayout(
+	hr = m_d3dDevice->CreateInputLayout(
 		vertexDesc,
 		ARRAYSIZE(vertexDesc),
 		mvsByteCode->GetBufferPointer(),
@@ -136,6 +138,7 @@ void BoxGame::BuildBox()
 	cbDesc.StructureByteStride = 0;
 
 	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBuffer.GetAddressOf());
+	DX::ThrowIfFailed(hr);
 
 	m_d3dContext->VSSetConstantBuffers(0, 1, m_constantBuffer.GetAddressOf());
 }
