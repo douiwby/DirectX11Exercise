@@ -10,19 +10,6 @@ void BoxGame::Initialize(HWND window, int width, int height)
 
 	SetInputLayout();
 	BuildBox();
-
-	XMStoreFloat4x4(&m_world, XMMatrixIdentity());
-
-	XMVECTOR pos = XMVectorSet(0.f, 2.f, -5.f, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&m_view, view);
-
-	float fovAngleY = 45.f * XM_PI / 180.f;
-	float aspectRatio = m_outputWidth / m_outputHeight;
-	XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, 1.f, 1000.f);
-	XMStoreFloat4x4(&m_proj, perspectiveMatrix);
 }
 
 void BoxGame::SetInputLayout()
@@ -52,16 +39,6 @@ void BoxGame::SetInputLayout()
 
 	m_d3dContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
 	m_d3dContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
-
-	if (m_ShowWireframe)
-	{
-		CD3D11_RASTERIZER_DESC rsDesc(D3D11_DEFAULT);
-		rsDesc.FillMode = D3D11_FILL_WIREFRAME;
-		rsDesc.CullMode = D3D11_CULL_NONE;
-		ComPtr<ID3D11RasterizerState> mRSState;
-		m_d3dDevice->CreateRasterizerState(&rsDesc, mRSState.GetAddressOf());
-		m_d3dContext->RSSetState(mRSState.Get());
-	}
 }
 
 void BoxGame::BuildBox()
@@ -166,15 +143,11 @@ void BoxGame::BuildBox()
 // Updates the world.
 void BoxGame::Update(DX::StepTimer const& timer)
 {
-	// Rotate the model
+	Super::Update(timer);
+
 	XMMATRIX world = XMLoadFloat4x4(&m_world);
 	XMMATRIX view = XMLoadFloat4x4(&m_view);
 	XMMATRIX proj = XMLoadFloat4x4(&m_proj);
-
-	float radiansPerSecond = XMConvertToRadians(45);
-	double totalRotation = timer.GetTotalSeconds() * radiansPerSecond;
-	float radians = static_cast<float>(fmod(totalRotation, XM_2PI));
-	world = XMMatrixRotationY(radians);
 
 	XMMATRIX mWorldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, view), proj);
 	XMFLOAT4X4 cbWorldViewProj;

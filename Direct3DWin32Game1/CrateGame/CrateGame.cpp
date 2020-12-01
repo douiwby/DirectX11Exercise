@@ -56,16 +56,6 @@ void CrateGame::SetInputLayout()
 
 	m_d3dContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
 	m_d3dContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
-
-	if (m_ShowWireframe)
-	{
-		CD3D11_RASTERIZER_DESC rsDesc(D3D11_DEFAULT);
-		rsDesc.FillMode = D3D11_FILL_WIREFRAME;
-		rsDesc.CullMode = D3D11_CULL_NONE;
-		ComPtr<ID3D11RasterizerState> mRSState;
-		m_d3dDevice->CreateRasterizerState(&rsDesc, mRSState.GetAddressOf());
-		m_d3dContext->RSSetState(mRSState.Get());
-	}
 }
 
 void CrateGame::BuildCrate()

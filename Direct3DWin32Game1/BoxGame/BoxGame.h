@@ -30,10 +30,4 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11Buffer>		m_constantBuffer;
 
 	UINT m_indexCount;
-
-	bool m_ShowWireframe = false;
-
-	DirectX::XMFLOAT4X4 m_world;
-	DirectX::XMFLOAT4X4 m_view;
-	DirectX::XMFLOAT4X4 m_proj;
 };

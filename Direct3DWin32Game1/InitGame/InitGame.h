@@ -26,6 +26,13 @@ public:
 	// Properties
 	void GetDefaultSize(int& width, int& height) const noexcept;
 
+	virtual void OnMouseDown(WPARAM btnState, int x, int y);
+	virtual void OnMouseUp(WPARAM btnState, int x, int y);
+	virtual void OnMouseMove(WPARAM btnState, int x, int y);
+
+	virtual void ToggleWireframe();
+	virtual void ToggleAutoRotate();
+
 protected:
 
 	virtual void Update(DX::StepTimer const& timer);
@@ -54,5 +61,16 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_renderTargetView;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_depthStencilView;
 
-	bool bEnable4xMsaa = true;
+	DirectX::XMFLOAT4X4 m_world;
+	DirectX::XMFLOAT4X4 m_view;
+	DirectX::XMFLOAT4X4 m_proj;
+
+	bool bEnable4xMsaa = true;	
+	bool bAutoRotate = false;
+	bool bShowWireframe = false;
+
+	POINT m_lastMousePos;
+	float m_theta;
+	float m_phi;
+	float m_radius;
 };

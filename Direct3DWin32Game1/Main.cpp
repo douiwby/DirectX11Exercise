@@ -260,6 +260,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // A menu is active and the user presses a key that does not correspond
         // to any mnemonic or accelerator key. Ignore so we don't produce an error beep.
         return MAKELRESULT(0, MNC_CLOSE);
+
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		game->OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		break;
+	case WM_LBUTTONUP:
+	case WM_MBUTTONUP:
+	case WM_RBUTTONUP:
+		game->OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		break;
+	case WM_MOUSEMOVE:
+		game->OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		break;
+	case WM_KEYUP:
+		// For the key map
+		// https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+		if (wParam == 0x46) // F key
+		{
+			game->ToggleWireframe();
+		}
+		if (wParam == 0x47) // G key
+		{
+			game->ToggleAutoRotate();
+		}
+		else if (wParam == VK_ESCAPE)
+		{
+			PostQuitMessage(0);
+		}
+		break;
     }
 
     return DefWindowProc(hWnd, message, wParam, lParam);

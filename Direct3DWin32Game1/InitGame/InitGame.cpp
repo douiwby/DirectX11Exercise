@@ -4,11 +4,14 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
-InitGame::InitGame():
+InitGame::InitGame() :
 	m_window(nullptr),
 	m_outputWidth(800),
 	m_outputHeight(600),
-	m_featureLevel(D3D_FEATURE_LEVEL_11_0)
+	m_featureLevel(D3D_FEATURE_LEVEL_11_0),
+	m_theta(1.5f*XM_PI),
+	m_phi(0.25f*XM_PI),
+	m_radius(5.0f)
 {
 }
 
@@ -21,6 +24,19 @@ void InitGame::Initialize(HWND window, int width, int height)
 	CreateDevice();
 
 	CreateResources();
+
+	XMStoreFloat4x4(&m_world, XMMatrixIdentity());
+
+	XMVECTOR pos = XMVectorSet(0.f, 2.f, -5.f, 1.0f);
+	XMVECTOR target = XMVectorZero();
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
+	XMStoreFloat4x4(&m_view, view);
+
+	float fovAngleY = 45.f * XM_PI / 180.f;
+	float aspectRatio = m_outputWidth / m_outputHeight;
+	XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, 1.f, 1000.f);
+	XMStoreFloat4x4(&m_proj, perspectiveMatrix);
 }
 
 void InitGame::Tick()
@@ -79,8 +95,31 @@ void InitGame::Update(DX::StepTimer const& timer)
 {
 	float elapsedTime = float(timer.GetElapsedSeconds());
 
-	// TODO: Add your game logic here.
-	elapsedTime;
+	if (bAutoRotate)
+	{
+		// Rotate the model
+		float radiansPerSecond = XMConvertToRadians(45);
+		double totalRotation = timer.GetTotalSeconds() * radiansPerSecond;
+		float radians = static_cast<float>(fmod(totalRotation, XM_2PI));
+		XMStoreFloat4x4(&m_world, XMMatrixRotationY(radians));
+	}
+	else
+	{
+		// Convert Spherical to Cartesian coordinates.
+		float x = m_radius * sinf(m_phi)*cosf(m_theta);
+		float z = m_radius * sinf(m_phi)*sinf(m_theta);
+		float y = m_radius * cosf(m_phi);
+
+		//mEyePosW = XMFLOAT3(x, y, z);
+
+		// Build the view matrix.
+		XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
+		XMVECTOR target = XMVectorZero();
+		XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+		XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
+		XMStoreFloat4x4(&m_view, V);
+	}
 }
 
 // Draws the scene.
@@ -308,4 +347,70 @@ void InitGame::OnDeviceLost()
 	CreateDevice();
 
 	CreateResources();
+}
+
+void InitGame::OnMouseDown(WPARAM btnState, int x, int y)
+{
+	m_lastMousePos.x = x;
+	m_lastMousePos.y = y;
+
+	SetCapture(m_window);
+}
+
+void InitGame::OnMouseUp(WPARAM btnState, int x, int y)
+{
+	ReleaseCapture();
+}
+
+void InitGame::OnMouseMove(WPARAM btnState, int x, int y)
+{
+	if ((btnState & MK_LBUTTON) != 0)
+	{
+		// Make each pixel correspond to a quarter of a degree.
+		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - m_lastMousePos.x));
+		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - m_lastMousePos.y));
+
+		// Update angles based on input to orbit camera around box.
+		m_theta += dx;
+		m_phi += dy;
+
+		// Restrict the angle mPhi.
+		m_phi = DX::Clamp(m_phi, 0.1f, XM_PI - 0.1f);
+	}
+	else if ((btnState & MK_RBUTTON) != 0)
+	{
+		// Make each pixel correspond to 0.01 unit in the scene.
+		float dx = 0.01f*static_cast<float>(x - m_lastMousePos.x);
+		float dy = 0.01f*static_cast<float>(y - m_lastMousePos.y);
+
+		// Update the camera radius based on input.
+		m_radius += dx - dy;
+
+		// Restrict the radius.
+		m_radius = DX::Clamp(m_radius, 1.0f, 15.0f);
+	}
+
+	m_lastMousePos.x = x;
+	m_lastMousePos.y = y;
+}
+
+void InitGame::ToggleWireframe()
+{
+	bShowWireframe = !bShowWireframe;
+
+	CD3D11_RASTERIZER_DESC rsDesc(D3D11_DEFAULT);
+	if (bShowWireframe)
+	{
+		
+		rsDesc.FillMode = D3D11_FILL_WIREFRAME;
+		rsDesc.CullMode = D3D11_CULL_NONE;
+	}
+	ComPtr<ID3D11RasterizerState> mRSState;
+	m_d3dDevice->CreateRasterizerState(&rsDesc, mRSState.GetAddressOf());
+	m_d3dContext->RSSetState(mRSState.Get());
+}
+
+void InitGame::ToggleAutoRotate()
+{
+	bAutoRotate = !bAutoRotate;
 }

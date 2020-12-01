@@ -28,6 +28,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <Windowsx.h>
 
 #include <wrl/client.h>
 
@@ -59,4 +60,9 @@ namespace DX
             throw std::exception();
         }
     }
+	template<typename T>
+	inline T Clamp(const T& x, const T& low, const T& high)
+	{
+		return x < low ? low : (x > high ? high : x);
+	}
 }
