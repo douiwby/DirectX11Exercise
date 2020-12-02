@@ -73,4 +73,6 @@ protected:
 	float m_theta;
 	float m_phi;
 	float m_radius;
+	float m_minRadius = 1.0f;
+	float m_maxRadius = 25.f;
 };

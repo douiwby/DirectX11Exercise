@@ -202,20 +202,21 @@ void CrateGame::ToggleSampler()
 {
 	CD3D11_SAMPLER_DESC samplerDesc(D3D11_DEFAULT);
 
-	switch (currentSampler%3)
+	switch (currentSampler%2)
 	{
 	case 0:
-		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-		break;
-	case 1:
 		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
 		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
 		break;
-	case 2:
+	case 1:
 		samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		break;
+	case 2:
+		// Not use now
+		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 		break;
 	}	
 

@@ -387,7 +387,7 @@ void InitGame::OnMouseMove(WPARAM btnState, int x, int y)
 		m_radius += dx - dy;
 
 		// Restrict the radius.
-		m_radius = DX::Clamp(m_radius, 1.0f, 15.0f);
+		m_radius = DX::Clamp(m_radius, m_minRadius, m_maxRadius);
 	}
 
 	m_lastMousePos.x = x;
