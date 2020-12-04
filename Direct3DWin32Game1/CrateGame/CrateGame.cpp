@@ -1,7 +1,19 @@
 #include "pch.h"
 #include "CrateGame/CrateGame.h"
 
+#define USE_DirectXTK 1
+#define USE_D3DX 1
+
+#if USE_DirectXTK
+// Tutorial on how to add DirectXTK
+// https://github.com/microsoft/DirectXTK/wiki/Adding-the-DirectX-Tool-Kit
+#include "DDSTextureLoader.h"
+#elif USE_D3DX
 #include "C:\\Program Files (x86)\\Microsoft DirectX SDK (June 2010)\\Include\\D3DX11tex.h"
+#pragma comment(lib, "D3DX11.lib")
+#else 
+#error "Define how to load texture!"
+#endif
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -191,8 +203,13 @@ void CrateGame::BuildTexture()
 	m_d3dContext->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
 	++currentSampler;
 
+	const wchar_t* fileName = L"CrateGame\\WoodCrate01.dds";
+#if USE_DirectXTK
+	hr = CreateDDSTextureFromFile(m_d3dDevice.Get(), fileName, nullptr, m_diffuseMapView.GetAddressOf());
+#elif USE_D3DX
 	hr = D3DX11CreateShaderResourceViewFromFile(
-		m_d3dDevice.Get(), L"CrateGame\\WoodCrate01.dds", nullptr, nullptr, m_diffuseMapView.GetAddressOf(), nullptr);
+		m_d3dDevice.Get(), fileName, nullptr, nullptr, m_diffuseMapView.GetAddressOf(), nullptr);
+#endif
 	DX::ThrowIfFailed(hr);
 
 	m_d3dContext->PSSetShaderResources(0, 1, m_diffuseMapView.GetAddressOf());

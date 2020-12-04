@@ -154,7 +154,8 @@ void BoxGame::Update(DX::StepTimer const& timer)
 
 	XMMATRIX mWorldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, view), proj);
 	XMFLOAT4X4 cbWorldViewProj;
-	XMStoreFloat4x4(&cbWorldViewProj, XMMatrixTranspose(mWorldViewProj)); // TODO: Understand why need XMMatrixTranspose here?
+	// Use XMMatrixTranspose before send to GPU due to HLSL using column-major
+	XMStoreFloat4x4(&cbWorldViewProj, XMMatrixTranspose(mWorldViewProj)); 
 
 	m_d3dContext->UpdateSubresource(m_constantBuffer.Get(), 0, nullptr, &cbWorldViewProj, 0, 0);
 }
