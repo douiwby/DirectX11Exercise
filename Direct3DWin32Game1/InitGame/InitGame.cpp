@@ -27,7 +27,7 @@ void InitGame::Initialize(HWND window, int width, int height)
 
 	XMStoreFloat4x4(&m_world, XMMatrixIdentity());
 
-	XMVECTOR pos = XMVectorSet(0.f, 2.f, -5.f, 1.0f);
+	XMVECTOR pos = XMVectorSet(0.f, m_initCameraY, m_initCameraZ, 1.0f);
 	XMVECTOR target = XMVectorZero();
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
@@ -37,6 +37,8 @@ void InitGame::Initialize(HWND window, int width, int height)
 	float aspectRatio = m_outputWidth / m_outputHeight;
 	XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, 1.f, 1000.f);
 	XMStoreFloat4x4(&m_proj, perspectiveMatrix);
+
+	m_radius = sqrt(pow(m_initCameraY,2)+pow(m_initCameraZ,2));
 }
 
 void InitGame::Tick()
@@ -384,7 +386,7 @@ void InitGame::OnMouseMove(WPARAM btnState, int x, int y)
 		float dy = 0.01f*static_cast<float>(y - m_lastMousePos.y);
 
 		// Update the camera radius based on input.
-		m_radius += dx - dy;
+		m_radius += (dx - dy) * m_mouseMoveRate;
 
 		// Restrict the radius.
 		m_radius = DX::Clamp(m_radius, m_minRadius, m_maxRadius);

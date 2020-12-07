@@ -169,7 +169,7 @@
     <ClInclude Include="BoxGame\BoxGame.h" />
     <ClInclude Include="Common\d3dUtil.h" />
     <ClInclude Include="CrateGame\CrateGame.h" />
-    <ClInclude Include="Game.h" />
+    <ClInclude Include="HillGame\HillGame.h" />
     <ClInclude Include="InitGame\InitGame.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="StepTimer.h" />
@@ -178,7 +178,7 @@
     <ClCompile Include="BoxGame\BoxGame.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="CrateGame\CrateGame.cpp" />
-    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="HillGame\HillGame.cpp" />
     <ClCompile Include="InitGame\InitGame.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp">
@@ -200,13 +200,19 @@
     <Manifest Include="settings.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="BoxGame\Base.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="CrateGame\Crate.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Shaders\color.hlsl">
+    <FxCompile Include="HillGame\Hill.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

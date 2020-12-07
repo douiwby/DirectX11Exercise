@@ -7,9 +7,10 @@
 #include "InitGame/InitGame.h"
 #include "BoxGame/BoxGame.h"
 #include "CrateGame/CrateGame.h"
+#include "HillGame/HillGame.h"
 
 using namespace DirectX;
-using TargetGame = CrateGame;
+using TargetGame = HillGame;
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wcovered-switch-default"

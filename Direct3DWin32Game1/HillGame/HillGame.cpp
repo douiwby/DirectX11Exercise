@@ -1,21 +1,27 @@
 #include "pch.h"
-#include "BoxGame.h"
+#include "HillGame.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
-void BoxGame::Initialize(HWND window, int width, int height)
+void HillGame::Initialize(HWND window, int width, int height)
 {
+	m_initCameraY = 150.f;
+	m_initCameraZ = -150.f;
+	m_maxRadius = 300.f;
+	m_mouseMoveRate = 15.f;
+
 	Super::Initialize(window, width, height);
 
 	SetInputLayout();
-	BuildBox();
+	BuildHill();
+
 }
 
-void BoxGame::SetInputLayout()
+void HillGame::SetInputLayout()
 {
-	ComPtr<ID3DBlob> mvsByteCode = d3dUtil::CompileShader(L"BoxGame\\Base.hlsl", nullptr, "VS", "vs_5_0");
-	ComPtr<ID3DBlob> mpsByteCode = d3dUtil::CompileShader(L"BoxGame\\Base.hlsl", nullptr, "PS", "ps_5_0");
+	ComPtr<ID3DBlob> mvsByteCode = d3dUtil::CompileShader(L"HillGame\\Hill.hlsl", nullptr, "VS", "vs_5_0");
+	ComPtr<ID3DBlob> mpsByteCode = d3dUtil::CompileShader(L"HillGame\\Hill.hlsl", nullptr, "PS", "ps_5_0");
 
 	HRESULT hr = m_d3dDevice->CreateVertexShader(mvsByteCode->GetBufferPointer(), mvsByteCode->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
 	DX::ThrowIfFailed(hr);
@@ -25,7 +31,8 @@ void BoxGame::SetInputLayout()
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
 		{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0}
+		{"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0},
+		{"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,24,D3D11_INPUT_PER_VERTEX_DATA,0}
 	};
 
 	hr = m_d3dDevice->CreateInputLayout(
@@ -43,20 +50,104 @@ void BoxGame::SetInputLayout()
 	m_d3dContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 }
 
-void BoxGame::BuildBox()
+inline float HillGame::GetHeight(float x, float z) const
 {
-	// Set vertex buffer
-	BoxGameVertex vertices[] =
+	return 0.3f*(z*sinf(0.1f*x) + x * cosf(0.1f*z));
+}
+
+void HillGame::BuildHill()
+{
+	// CreateGrid
+	float width = 150.f;
+	float depth = 150.f;
+	const UINT m = 50;
+	const UINT n = 50;
+
+	const UINT vertexCount = m * n;
+	const UINT faceCount = (m - 1)*(n - 1) * 2;
+
+	//
+	// Create the vertices.
+	//
+
+	float halfWidth = 0.5f*width;
+	float halfDepth = 0.5f*depth;
+
+	float dx = width / (n - 1);
+	float dz = depth / (m - 1);
+
+	float du = 1.0f / (n - 1);
+	float dv = 1.0f / (m - 1);
+
+	HillGameVertex vertices[vertexCount];
+
+	for (UINT i = 0; i < m; ++i)
 	{
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) },
-		{ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) },
-		{ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) },
-		{ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green) },
-		{ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue) },
-		{ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) },
-		{ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan) },
-		{ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) }
-	};
+		float z = halfDepth - i * dz;
+		for (UINT j = 0; j < n; ++j)
+		{
+			float x = -halfWidth + j * dx;
+			float y = GetHeight(x, z);
+
+			vertices[i*n + j].position = XMFLOAT3(x, y, z);
+			
+			XMFLOAT4 color;
+			if (y < -10.0f)
+			{
+				// Sandy beach color.
+				color = XMFLOAT4(1.0f, 0.96f, 0.62f, 1.0f);
+			}
+			else if (y < 5.0f)
+			{
+				// Light yellow-green.
+				color = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+			}
+			else if (y < 12.0f)
+			{
+				// Dark yellow-green.
+				color = XMFLOAT4(0.1f, 0.48f, 0.19f, 1.0f);
+			}
+			else if (y < 20.0f)
+			{
+				// Dark brown.
+				color = XMFLOAT4(0.45f, 0.39f, 0.34f, 1.0f);
+			}
+			else
+			{
+				// White snow.
+				color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+			}
+			vertices[i*n + j].color = color;
+
+			vertices[i*n + j].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		}
+	}
+
+	//
+	// Create the indices.
+	//
+
+	UINT indices[faceCount * 3];
+
+	// Iterate over each quad and compute indices.
+	UINT k = 0;
+	for (UINT i = 0; i < m - 1; ++i)
+	{
+		for (UINT j = 0; j < n - 1; ++j)
+		{
+			indices[k] = i * n + j;
+			indices[k + 1] = i * n + j + 1;
+			indices[k + 2] = (i + 1)*n + j;
+
+			indices[k + 3] = (i + 1)*n + j;
+			indices[k + 4] = i * n + j + 1;
+			indices[k + 5] = (i + 1)*n + j + 1;
+
+			k += 6; // next quad
+		}
+	}
+
+	// Vertex buffer
 
 	D3D11_BUFFER_DESC vbDesc;
 	vbDesc.ByteWidth = sizeof(vertices);
@@ -74,37 +165,11 @@ void BoxGame::BuildBox()
 	HRESULT hr = m_d3dDevice->CreateBuffer(&vbDesc, &vbInitData, m_vertexBuffer.GetAddressOf());
 	DX::ThrowIfFailed(hr);
 
-	UINT stride = sizeof(BoxGameVertex);
+	UINT stride = sizeof(HillGameVertex);
 	UINT offset = 0;
 	m_d3dContext->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
 
-	// Set index buffer
-	UINT indices[] =
-	{
-		// front face
-		0, 1, 2,
-		0, 2, 3,
-
-		// back face
-		4, 6, 5,
-		4, 7, 6,
-
-		// left face
-		4, 5, 1,
-		4, 1, 0,
-
-		// right face
-		3, 2, 6,
-		3, 6, 7,
-
-		// top face
-		1, 5, 6,
-		1, 6, 2,
-
-		// bottom face
-		4, 0, 3,
-		4, 3, 7
-	};
+	// Index buffer
 
 	m_indexCount = ARRAYSIZE(indices);
 
@@ -144,7 +209,7 @@ void BoxGame::BuildBox()
 }
 
 // Updates the world.
-void BoxGame::Update(DX::StepTimer const& timer)
+void HillGame::Update(DX::StepTimer const& timer)
 {
 	Super::Update(timer);
 
@@ -155,13 +220,13 @@ void BoxGame::Update(DX::StepTimer const& timer)
 	XMMATRIX mWorldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, view), proj);
 	XMFLOAT4X4 cbWorldViewProj;
 	// Use XMMatrixTranspose before send to GPU due to HLSL using column-major
-	XMStoreFloat4x4(&cbWorldViewProj, XMMatrixTranspose(mWorldViewProj)); 
+	XMStoreFloat4x4(&cbWorldViewProj, XMMatrixTranspose(mWorldViewProj));
 
 	m_d3dContext->UpdateSubresource(m_constantBuffer.Get(), 0, nullptr, &cbWorldViewProj, 0, 0);
 }
 
 // Draws the scene.
-void BoxGame::Render()
+void HillGame::Render()
 {
 	// Don't try to render anything before the first Update.
 	if (m_timer.GetFrameCount() == 0)

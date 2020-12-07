@@ -75,4 +75,7 @@ protected:
 	float m_radius;
 	float m_minRadius = 1.0f;
 	float m_maxRadius = 25.f;
+	float m_mouseMoveRate = 1.f;
+	float m_initCameraY = 2.f;
+	float m_initCameraZ = -5.f;
 };
