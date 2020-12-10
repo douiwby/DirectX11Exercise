@@ -171,6 +171,9 @@
     <ClInclude Include="CrateGame\CrateGame.h" />
     <ClInclude Include="HillGame\HillGame.h" />
     <ClInclude Include="InitGame\InitGame.h" />
+    <ClInclude Include="MultiObjectGame\MultiObjectGame.h" />
+    <ClInclude Include="MultiObjectGame\RenderObject.h" />
+    <ClInclude Include="MultiShapeGame\MultiShapeGame.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="StepTimer.h" />
   </ItemGroup>
@@ -181,6 +184,9 @@
     <ClCompile Include="HillGame\HillGame.cpp" />
     <ClCompile Include="InitGame\InitGame.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MultiObjectGame\MultiObjectGame.cpp" />
+    <ClCompile Include="MultiObjectGame\RenderObject.cpp" />
+    <ClCompile Include="MultiShapeGame\MultiShapeGame.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

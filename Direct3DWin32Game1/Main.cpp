@@ -3,14 +3,14 @@
 //
 
 #include "pch.h"
-#include "Game.h"
 #include "InitGame/InitGame.h"
 #include "BoxGame/BoxGame.h"
 #include "CrateGame/CrateGame.h"
 #include "HillGame/HillGame.h"
+#include "MultiShapeGame/MultiShapeGame.h"
 
 using namespace DirectX;
-using TargetGame = HillGame;
+using TargetGame = MultiShapeGame;
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wcovered-switch-default"

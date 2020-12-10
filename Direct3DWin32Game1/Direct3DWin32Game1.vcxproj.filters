@@ -20,6 +20,12 @@
     <Filter Include="HillGame">
       <UniqueIdentifier>{8e2d066d-38f1-4094-baea-0c82c924bcd9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MultiObjectGame">
+      <UniqueIdentifier>{849a95db-0485-4b3c-867f-f480cbf5fe79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MultiShapeGame">
+      <UniqueIdentifier>{b5437f39-0cf2-44ec-baa1-975b300c681a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -39,6 +45,15 @@
     <ClInclude Include="HillGame\HillGame.h">
       <Filter>HillGame</Filter>
     </ClInclude>
+    <ClInclude Include="MultiObjectGame\MultiObjectGame.h">
+      <Filter>MultiObjectGame</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiObjectGame\RenderObject.h">
+      <Filter>MultiObjectGame</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiShapeGame\MultiShapeGame.h">
+      <Filter>MultiShapeGame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -57,6 +72,15 @@
     </ClCompile>
     <ClCompile Include="HillGame\HillGame.cpp">
       <Filter>HillGame</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiObjectGame\MultiObjectGame.cpp">
+      <Filter>MultiObjectGame</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiObjectGame\RenderObject.cpp">
+      <Filter>MultiObjectGame</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiShapeGame\MultiShapeGame.cpp">
+      <Filter>MultiShapeGame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
