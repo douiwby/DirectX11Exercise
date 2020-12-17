@@ -26,6 +26,9 @@
     <Filter Include="MultiShapeGame">
       <UniqueIdentifier>{b5437f39-0cf2-44ec-baa1-975b300c681a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HillAndWaveGame">
+      <UniqueIdentifier>{1729d628-50ff-41e1-a3ab-efd4dd5e5b87}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -54,6 +57,12 @@
     <ClInclude Include="MultiShapeGame\MultiShapeGame.h">
       <Filter>MultiShapeGame</Filter>
     </ClInclude>
+    <ClInclude Include="HillAndWaveGame\HillAndWaveGame.h">
+      <Filter>HillAndWaveGame</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiObjectGame\VertexStructuer.h">
+      <Filter>MultiObjectGame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -81,6 +90,9 @@
     </ClCompile>
     <ClCompile Include="MultiShapeGame\MultiShapeGame.cpp">
       <Filter>MultiShapeGame</Filter>
+    </ClCompile>
+    <ClCompile Include="HillAndWaveGame\HillAndWaveGame.cpp">
+      <Filter>HillAndWaveGame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

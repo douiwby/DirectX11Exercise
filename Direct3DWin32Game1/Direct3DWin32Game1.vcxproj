@@ -169,10 +169,12 @@
     <ClInclude Include="BoxGame\BoxGame.h" />
     <ClInclude Include="Common\d3dUtil.h" />
     <ClInclude Include="CrateGame\CrateGame.h" />
+    <ClInclude Include="HillAndWaveGame\HillAndWaveGame.h" />
     <ClInclude Include="HillGame\HillGame.h" />
     <ClInclude Include="InitGame\InitGame.h" />
     <ClInclude Include="MultiObjectGame\MultiObjectGame.h" />
     <ClInclude Include="MultiObjectGame\RenderObject.h" />
+    <ClInclude Include="MultiObjectGame\VertexStructuer.h" />
     <ClInclude Include="MultiShapeGame\MultiShapeGame.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="StepTimer.h" />
@@ -181,6 +183,7 @@
     <ClCompile Include="BoxGame\BoxGame.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="CrateGame\CrateGame.cpp" />
+    <ClCompile Include="HillAndWaveGame\HillAndWaveGame.cpp" />
     <ClCompile Include="HillGame\HillGame.cpp" />
     <ClCompile Include="InitGame\InitGame.cpp" />
     <ClCompile Include="Main.cpp" />

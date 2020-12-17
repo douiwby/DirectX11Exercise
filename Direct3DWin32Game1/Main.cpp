@@ -8,9 +8,10 @@
 #include "CrateGame/CrateGame.h"
 #include "HillGame/HillGame.h"
 #include "MultiShapeGame/MultiShapeGame.h"
+#include "HillAndWaveGame/HillAndWaveGame.h"
 
 using namespace DirectX;
-using TargetGame = MultiShapeGame;
+using TargetGame = HillAndWaveGame;
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
