@@ -99,29 +99,23 @@ void InitGame::Update(DX::StepTimer const& timer)
 
 	if (bAutoRotate)
 	{
-		// Rotate the model
-		float radiansPerSecond = XMConvertToRadians(45);
-		double totalRotation = timer.GetTotalSeconds() * radiansPerSecond;
-		float radians = static_cast<float>(fmod(totalRotation, XM_2PI));
-		XMStoreFloat4x4(&m_world, XMMatrixRotationY(radians));
+		m_theta += m_rotateSpeed * elapsedTime;
 	}
-	else
-	{
-		// Convert Spherical to Cartesian coordinates.
-		float x = m_radius * sinf(m_phi)*cosf(m_theta);
-		float z = m_radius * sinf(m_phi)*sinf(m_theta);
-		float y = m_radius * cosf(m_phi);
 
-		//mEyePosW = XMFLOAT3(x, y, z);
+	// Convert Spherical to Cartesian coordinates.
+	float x = m_radius * sinf(m_phi)*cosf(m_theta);
+	float z = m_radius * sinf(m_phi)*sinf(m_theta);
+	float y = m_radius * cosf(m_phi);
 
-		// Build the view matrix.
-		XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-		XMVECTOR target = XMVectorZero();
-		XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	// Build the view matrix.
+	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
+	XMVECTOR target = XMVectorZero();
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-		XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-		XMStoreFloat4x4(&m_view, V);
-	}
+	XMStoreFloat4(&m_eyePos, pos);
+
+	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
+	XMStoreFloat4x4(&m_view, V);
 }
 
 // Draws the scene.
@@ -373,7 +367,10 @@ void InitGame::OnMouseMove(WPARAM btnState, int x, int y)
 		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - m_lastMousePos.y));
 
 		// Update angles based on input to orbit camera around box.
-		m_theta += dx;
+		if (!bAutoRotate)
+		{
+			m_theta += dx;
+		}
 		m_phi += dy;
 
 		// Restrict the angle mPhi.

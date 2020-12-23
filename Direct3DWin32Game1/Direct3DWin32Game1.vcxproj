@@ -172,8 +172,12 @@
     <ClInclude Include="HillAndWaveGame\HillAndWaveGame.h" />
     <ClInclude Include="HillGame\HillGame.h" />
     <ClInclude Include="InitGame\InitGame.h" />
+    <ClInclude Include="LitHillGame\LightStructuer.h" />
+    <ClInclude Include="LitHillGame\LitHillGame.h" />
+    <ClInclude Include="LitHillGame\LitShape.h" />
     <ClInclude Include="MultiObjectGame\MultiObjectGame.h" />
     <ClInclude Include="MultiObjectGame\RenderObject.h" />
+    <ClInclude Include="MultiObjectGame\Shape.h" />
     <ClInclude Include="MultiObjectGame\VertexStructuer.h" />
     <ClInclude Include="MultiShapeGame\MultiShapeGame.h" />
     <ClInclude Include="pch.h" />
@@ -186,9 +190,13 @@
     <ClCompile Include="HillAndWaveGame\HillAndWaveGame.cpp" />
     <ClCompile Include="HillGame\HillGame.cpp" />
     <ClCompile Include="InitGame\InitGame.cpp" />
+    <ClCompile Include="LitHillGame\LightStructuer.cpp" />
+    <ClCompile Include="LitHillGame\LitHillGame.cpp" />
+    <ClCompile Include="LitHillGame\LitShape.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MultiObjectGame\MultiObjectGame.cpp" />
     <ClCompile Include="MultiObjectGame\RenderObject.cpp" />
+    <ClCompile Include="MultiObjectGame\Shape.cpp" />
     <ClCompile Include="MultiShapeGame\MultiShapeGame.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -222,6 +230,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="HillGame\Hill.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="LitHillGame\LightHelper.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="LitHillGame\Lighting.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

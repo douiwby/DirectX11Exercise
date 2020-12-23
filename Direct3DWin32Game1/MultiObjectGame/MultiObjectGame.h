@@ -6,8 +6,8 @@
 
 class MultiObjectGame : public InitGame
 {
-public:
 	using Super = InitGame;
+public:
 
 	virtual ~MultiObjectGame() = default;
 
@@ -15,5 +15,8 @@ public:
 	virtual void Tick();
 
 protected:
+
+	virtual void Update(DX::StepTimer const& timer);
+
 	std::vector<RenderObject*> m_objects;
 };

@@ -17,10 +17,10 @@ void MultiObjectGame::Initialize(HWND window, int width, int height)
 
 void MultiObjectGame::Tick()
 {
-	Super::Update(m_timer);
-
 	m_timer.Tick([&]()
 	{
+		Update(m_timer);
+
 		// Don't try to render anything before the first Update.
 		bool bDraw = m_timer.GetFrameCount() != 0;
 
@@ -44,4 +44,9 @@ void MultiObjectGame::Tick()
 			Present();
 		}
 	});
+}
+
+void MultiObjectGame::Update(DX::StepTimer const & timer)
+{
+	Super::Update(m_timer);
 }

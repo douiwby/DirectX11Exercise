@@ -29,6 +29,9 @@
     <Filter Include="HillAndWaveGame">
       <UniqueIdentifier>{1729d628-50ff-41e1-a3ab-efd4dd5e5b87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LitHillGame">
+      <UniqueIdentifier>{88e57a9f-9d87-4cc9-ba33-b8bdbcacf19a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -63,6 +66,18 @@
     <ClInclude Include="MultiObjectGame\VertexStructuer.h">
       <Filter>MultiObjectGame</Filter>
     </ClInclude>
+    <ClInclude Include="LitHillGame\LitHillGame.h">
+      <Filter>LitHillGame</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiObjectGame\Shape.h">
+      <Filter>MultiObjectGame</Filter>
+    </ClInclude>
+    <ClInclude Include="LitHillGame\LightStructuer.h">
+      <Filter>LitHillGame</Filter>
+    </ClInclude>
+    <ClInclude Include="LitHillGame\LitShape.h">
+      <Filter>LitHillGame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -94,6 +109,18 @@
     <ClCompile Include="HillAndWaveGame\HillAndWaveGame.cpp">
       <Filter>HillAndWaveGame</Filter>
     </ClCompile>
+    <ClCompile Include="LitHillGame\LitHillGame.cpp">
+      <Filter>LitHillGame</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiObjectGame\Shape.cpp">
+      <Filter>MultiObjectGame</Filter>
+    </ClCompile>
+    <ClCompile Include="LitHillGame\LightStructuer.cpp">
+      <Filter>LitHillGame</Filter>
+    </ClCompile>
+    <ClCompile Include="LitHillGame\LitShape.cpp">
+      <Filter>LitHillGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -123,6 +150,12 @@
     </FxCompile>
     <FxCompile Include="HillGame\Hill.hlsl">
       <Filter>HillGame</Filter>
+    </FxCompile>
+    <FxCompile Include="LitHillGame\LightHelper.hlsl">
+      <Filter>LitHillGame</Filter>
+    </FxCompile>
+    <FxCompile Include="LitHillGame\Lighting.hlsl">
+      <Filter>LitHillGame</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

@@ -145,7 +145,7 @@ void Box::BuildShape()
 	cbDesc.MiscFlags = 0;
 	cbDesc.StructureByteStride = 0;
 
-	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBuffer.GetAddressOf());
+	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
 	DX::ThrowIfFailed(hr);
 }
 
@@ -162,7 +162,7 @@ void Box::Update(DX::StepTimer const& timer)
 	// Use XMMatrixTranspose before send to GPU due to HLSL using column-major
 	XMStoreFloat4x4(&cbWorldViewProj, XMMatrixTranspose(mWorldViewProj));
 
-	m_d3dContext->UpdateSubresource(m_constantBuffer.Get(), 0, nullptr, &cbWorldViewProj, 0, 0);
+	m_d3dContext->UpdateSubresource(m_constantBufferPerObject.Get(), 0, nullptr, &cbWorldViewProj, 0, 0);
 }
 
 // Draws the scene.
@@ -175,7 +175,7 @@ void Box::Render()
 	m_d3dContext->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
 	m_d3dContext->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	m_d3dContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_d3dContext->VSSetConstantBuffers(0, 1, m_constantBuffer.GetAddressOf());
+	m_d3dContext->VSSetConstantBuffers(0, 1, m_constantBufferPerObject.GetAddressOf());
 	m_d3dContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
 	m_d3dContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 
@@ -268,7 +268,7 @@ void Box2::BuildShape()
 	cbDesc.MiscFlags = 0;
 	cbDesc.StructureByteStride = 0;
 
-	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBuffer.GetAddressOf());
+	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
 	DX::ThrowIfFailed(hr);
 }
 
@@ -284,7 +284,7 @@ void Box2::Update(DX::StepTimer const & timer)
 	// Use XMMatrixTranspose before send to GPU due to HLSL using column-major
 	XMStoreFloat4x4(&cbWorldViewProj, XMMatrixTranspose(mWorldViewProj));
 
-	m_d3dContext->UpdateSubresource(m_constantBuffer.Get(), 0, nullptr, &cbWorldViewProj, 0, 0);
+	m_d3dContext->UpdateSubresource(m_constantBufferPerObject.Get(), 0, nullptr, &cbWorldViewProj, 0, 0);
 }
 
 void Pyramid::BuildShape()
@@ -357,7 +357,7 @@ void Pyramid::BuildShape()
 	cbDesc.MiscFlags = 0;
 	cbDesc.StructureByteStride = 0;
 
-	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBuffer.GetAddressOf());
+	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
 	DX::ThrowIfFailed(hr);
 }
 
@@ -374,5 +374,5 @@ void Pyramid::Update(DX::StepTimer const& timer)
 	// Use XMMatrixTranspose before send to GPU due to HLSL using column-major
 	XMStoreFloat4x4(&cbWorldViewProj, XMMatrixTranspose(mWorldViewProj));
 
-	m_d3dContext->UpdateSubresource(m_constantBuffer.Get(), 0, nullptr, &cbWorldViewProj, 0, 0);
+	m_d3dContext->UpdateSubresource(m_constantBufferPerObject.Get(), 0, nullptr, &cbWorldViewProj, 0, 0);
 }

@@ -61,6 +61,8 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_renderTargetView;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_depthStencilView;
 
+	DirectX::XMFLOAT4 m_eyePos;
+
 	DirectX::XMFLOAT4X4 m_world;
 	DirectX::XMFLOAT4X4 m_view;
 	DirectX::XMFLOAT4X4 m_proj;
@@ -78,4 +80,5 @@ protected:
 	float m_mouseMoveRate = 1.f;
 	float m_initCameraY = 2.f;
 	float m_initCameraZ = -5.f;
+	float m_rotateSpeed = DirectX::XMConvertToRadians(45);
 };

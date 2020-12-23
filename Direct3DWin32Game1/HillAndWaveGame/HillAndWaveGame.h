@@ -1,7 +1,6 @@
 #pragma once
-#include "MultiObjectGame/RenderObject.h"
+#include "MultiObjectGame/Shape.h"
 #include "MultiObjectGame/MultiObjectGame.h"
-#include "MultiObjectGame/VertexStructuer.h"
 
 class HillAndWaveGame : public MultiObjectGame
 {
@@ -13,34 +12,15 @@ public:
 	virtual void Initialize(HWND window, int width, int height);
 };
 
-class Shape : public RenderObject
-{
-public:
-	using Super = RenderObject;
-
-	virtual void Initialize(
-		Microsoft::WRL::ComPtr<ID3D11Device>& device,
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context,
-		DirectX::XMFLOAT4X4* view,
-		DirectX::XMFLOAT4X4* proj);
-
-	virtual void Update(DX::StepTimer const& timer);
-	virtual void Render();
-
-protected:
-	virtual void SetInputLayout();
-	virtual void BuildShape() = 0;
-};
-
 class Hill : public Shape
 {
-public:
 	using Super = Shape;
 
 protected:
 	virtual void BuildShape();
 
 	inline float GetHeight(float x, float z) const;
+	inline DirectX::XMFLOAT3 GetHillNormal(float x, float z) const;
 
 	float width = 150.f;
 	float depth = 150.f;
@@ -50,10 +30,10 @@ protected:
 
 class Wave : public Shape
 {
+	using Super = Shape;
 public:
 	Wave();
 	virtual ~Wave();
-	using Super = Shape;
 
 	virtual void Update(DX::StepTimer const& timer);
 
@@ -71,9 +51,9 @@ protected:
 	float m_damping = 0.4f;
 
 	float m_timeStep = 0.03f;
-	float m_spatialStep = 0.8f;
+	float m_spatialStep = 0.75f;
 
-	const UINT m_numRows = 200;
-	const UINT m_numCols = 200;
+	const UINT m_numRows = 201;
+	const UINT m_numCols = 201;
 
 };

@@ -1,13 +1,12 @@
 #include "pch.h"
-#include "HillAndWaveGame\HillAndWaveGame.h"
-#include "MultiObjectGame/VertexStructuer.h"
+#include "LitHillGame/LitHillGame.h"
 #include <time.h>
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
-using VertexType = VertexPositionNormalColor;
+using VertexType = VertexPositionNormalColor; // The color is not using
 
-HillAndWaveGame::~HillAndWaveGame()
+LitHillGame::~LitHillGame()
 {
 	for (auto it = m_objects.begin(); it != m_objects.end(); ++it)
 	{
@@ -15,10 +14,10 @@ HillAndWaveGame::~HillAndWaveGame()
 	}
 }
 
-void HillAndWaveGame::Initialize(HWND window, int width, int height)
+void LitHillGame::Initialize(HWND window, int width, int height)
 {
-	m_objects.push_back(new Hill());
-	m_objects.push_back(new Wave());
+	m_objects.push_back(new LitHill());
+	m_objects.push_back(new LitWave());
 
 	m_initCameraY = 150.f;
 	m_initCameraZ = -150.f;
@@ -26,28 +25,103 @@ void HillAndWaveGame::Initialize(HWND window, int width, int height)
 	m_mouseMoveRate = 15.f;
 
 	Super::Initialize(window, width, height);
+
+	BuildLight();
 }
 
-inline float Hill::GetHeight(float x, float z) const
+void LitHillGame::BuildLight()
 {
-	return 0.3f*(z*sinf(0.1f*x) + x * cosf(0.1f*z));
+	// Directional light.
+	m_dirLight.Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	m_dirLight.Diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_dirLight.Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_dirLight.Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+
+	// Point light--position is changed every frame to animate in UpdateScene function.
+	m_pointLight.Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+	m_pointLight.Diffuse = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
+	m_pointLight.Specular = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
+	m_pointLight.Att = XMFLOAT3(0.0f, 0.1f, 0.0f);
+	m_pointLight.Range = 25.0f;
+
+	// Spot light--position and direction changed every frame to animate in UpdateScene function.
+	m_spotLight.Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	m_spotLight.Diffuse = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	m_spotLight.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_spotLight.Att = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	m_spotLight.Spot = 96.0f;
+	m_spotLight.Range = 1000.0f;
+	m_spotLight.Position = XMFLOAT3(0.0f, 100.0f, 0.0f);
+
+	m_cbPerFrame.dirLight = m_dirLight;
+	m_cbPerFrame.pointLight = m_pointLight;
+	m_cbPerFrame.spotLight = m_spotLight;
+
+	D3D11_BUFFER_DESC cbDesc;
+	cbDesc.ByteWidth = sizeof(cbPerFrame);
+	cbDesc.Usage = D3D11_USAGE_DEFAULT;
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.CPUAccessFlags = 0;
+	cbDesc.MiscFlags = 0;
+	cbDesc.StructureByteStride = 0;
+
+	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerFrame.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+
+	m_d3dContext->PSSetConstantBuffers(0, 1, m_constantBufferPerFrame.GetAddressOf());
 }
 
-inline XMFLOAT3 Hill::GetHillNormal(float x, float z) const
+void LitHillGame::Update(DX::StepTimer const & timer)
 {
-	// n = (-df/dx, 1, -df/dz)
-	XMFLOAT3 n(
-		-0.03f*z*cosf(0.1f*x) - 0.3f*cosf(0.1f*z),
-		1.0f,
-		-0.3f*sinf(0.1f*x) + 0.03f*x*sinf(0.1f*z));
+	Super::Update(timer);
 
-	XMVECTOR unitNormal = XMVector3Normalize(XMLoadFloat3(&n));
-	XMStoreFloat3(&n, unitNormal);
+	UpdateLightPosition(timer);
 
-	return n;
+	m_cbPerFrame.dirLight = m_dirLight;
+	m_cbPerFrame.pointLight = m_pointLight;
+	m_cbPerFrame.spotLight = m_spotLight;
+	m_cbPerFrame.eyePosW = m_eyePos;
+	m_d3dContext->UpdateSubresource(m_constantBufferPerFrame.Get(), 0, nullptr, &m_cbPerFrame, 0, 0);
 }
 
-void Hill::BuildShape()
+void LitHillGame::UpdateLightPosition(DX::StepTimer const & timer)
+{
+	float elapsedTime = float(timer.GetElapsedSeconds());
+	float totalTime = timer.GetTotalSeconds();
+
+	// Circle light over the land surface.
+	m_pointLight.Position.x = 70.0f*cosf(0.2f*totalTime);
+	m_pointLight.Position.z = 70.0f*sinf(0.2f*totalTime);
+	float x = m_pointLight.Position.x;
+	float z = m_pointLight.Position.z;
+	m_pointLight.Position.y = fmaxf(0.3f*(z*sinf(0.1f*x) + x * cosf(0.1f*z)), -3.0f) + 10.0f;
+
+	// The spotlight takes on the camera position and is aimed in the
+	// same direction the camera is looking.  In this way, it looks
+	// like we are holding a flashlight.
+	//m_spotLight.Position = XMFLOAT3(m_eyePos.x, m_eyePos.y, m_eyePos.z);
+	//XMVECTOR pos = XMVectorSet(m_eyePos.x, m_eyePos.y, m_eyePos.z, 1.0f);
+	//XMVECTOR target = XMVectorZero();
+	//XMStoreFloat3(&m_spotLight.Direction, XMVector3Normalize(target - pos));
+
+	// Use keyboard to control the position
+	float movingSpeed = 40.0f;
+	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+	{
+		m_spotLight.Position.x -= movingSpeed * elapsedTime;
+	}
+	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+		m_spotLight.Position.x += movingSpeed * elapsedTime;
+
+	if (GetAsyncKeyState(VK_UP) & 0x8000)
+		m_spotLight.Position.z += movingSpeed * elapsedTime;
+
+	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+		m_spotLight.Position.z -= movingSpeed * elapsedTime;
+	m_spotLight.Direction = XMFLOAT3(0.0f, -1.0f, 0.0f);
+}
+
+void LitHill::BuildShape()
 {
 	// CreateGrid
 
@@ -175,7 +249,7 @@ void Hill::BuildShape()
 
 	// Set constant buffer
 	D3D11_BUFFER_DESC cbDesc;
-	cbDesc.ByteWidth = sizeof(XMFLOAT4X4);
+	cbDesc.ByteWidth = sizeof(cbPerObjectStruct);
 	cbDesc.Usage = D3D11_USAGE_DEFAULT;
 	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	cbDesc.CPUAccessFlags = 0;
@@ -189,7 +263,34 @@ void Hill::BuildShape()
 	delete[] indices;
 }
 
-Wave::Wave()
+void LitHill::BuildMaterial()
+{
+	m_cbPerObject.material.ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	m_cbPerObject.material.diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	m_cbPerObject.material.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
+	m_cbPerObject.material.reflect = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+}
+
+inline float LitHill::GetHeight(float x, float z) const
+{
+	return 0.3f*(z*sinf(0.1f*x) + x * cosf(0.1f*z));
+}
+
+inline DirectX::XMFLOAT3 LitHill::GetHillNormal(float x, float z) const
+{
+	// n = (-df/dx, 1, -df/dz)
+	XMFLOAT3 n(
+		-0.03f*z*cosf(0.1f*x) - 0.3f*cosf(0.1f*z),
+		1.0f,
+		-0.3f*sinf(0.1f*x) + 0.03f*x*sinf(0.1f*z));
+
+	XMVECTOR unitNormal = XMVector3Normalize(XMLoadFloat3(&n));
+	XMStoreFloat3(&n, unitNormal);
+
+	return n;
+}
+
+LitWave::LitWave()
 {
 	float dt = m_timeStep;
 	float dx = m_spatialStep;
@@ -202,6 +303,8 @@ Wave::Wave()
 
 	m_prevSolution = new XMFLOAT3[m_numRows*m_numCols];
 	m_currSolution = new XMFLOAT3[m_numRows*m_numCols];
+	m_normals = new XMFLOAT3[m_numRows*m_numCols];
+	m_tangentX = new XMFLOAT3[m_numRows*m_numCols];
 
 	// Generate grid vertices in system memory.
 	UINT m = m_numRows;
@@ -219,17 +322,21 @@ Wave::Wave()
 
 			m_prevSolution[i*n + j] = XMFLOAT3(x, 0.0f, z);
 			m_currSolution[i*n + j] = XMFLOAT3(x, 0.0f, z);
+			m_normals[i*n + j] = XMFLOAT3(0.0f, 1.0f, 0.0f);
+			m_tangentX[i*n + j] = XMFLOAT3(1.0f, 0.0f, 0.0f);
 		}
 	}
 }
 
-Wave::~Wave()
+LitWave::~LitWave()
 {
 	delete[] m_prevSolution;
 	delete[] m_currSolution;
+	delete[] m_normals;
+	delete[] m_tangentX;
 }
 
-void Wave::BuildShape()
+void LitWave::BuildShape()
 {
 	// Create the vertex buffer.  Note that we allocate space only, as
 	// we will be updating the data every time step of the simulation.
@@ -260,12 +367,20 @@ void Wave::BuildShape()
 			vertices[i].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
 		}
 
+		D3D11_BUFFER_DESC vbDesc2;
+		vbDesc2.ByteWidth = sizeof(VertexType) * vertexCount;;
+		vbDesc2.Usage = D3D11_USAGE_IMMUTABLE;
+		vbDesc2.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vbDesc2.CPUAccessFlags = 0;
+		vbDesc2.MiscFlags = 0;
+		vbDesc2.StructureByteStride = 0;
+
 		D3D11_SUBRESOURCE_DATA vbInitData;
 		vbInitData.pSysMem = vertices;
 		vbInitData.SysMemPitch = 0;
 		vbInitData.SysMemSlicePitch = 0;
 
-		HRESULT hr = m_d3dDevice->CreateBuffer(&vbDesc, &vbInitData, m_vertexBuffer.GetAddressOf());
+		HRESULT hr = m_d3dDevice->CreateBuffer(&vbDesc2, &vbInitData, m_vertexBuffer.GetAddressOf());
 		DX::ThrowIfFailed(hr);
 
 		delete[] vertices;
@@ -318,7 +433,7 @@ void Wave::BuildShape()
 
 	// Set constant buffer
 	D3D11_BUFFER_DESC cbDesc;
-	cbDesc.ByteWidth = sizeof(XMFLOAT4X4);
+	cbDesc.ByteWidth = sizeof(cbPerObjectStruct);
 	cbDesc.Usage = D3D11_USAGE_DEFAULT;
 	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	cbDesc.CPUAccessFlags = 0;
@@ -331,46 +446,85 @@ void Wave::BuildShape()
 	delete[] indices;
 
 	time_t t;
-	srand((unsigned) time(&t));
+	srand((unsigned)time(&t));
 }
 
-void Wave::Update(DX::StepTimer const & timer)
+void LitWave::BuildMaterial()
 {
+	m_cbPerObject.material.ambient = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
+	m_cbPerObject.material.diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
+	m_cbPerObject.material.specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 96.0f);
+	m_cbPerObject.material.reflect = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+}
+
+void LitWave::Update(DX::StepTimer const & timer)
+{
+	float elapsedTime = float(timer.GetElapsedSeconds());
 	//
 	// Every quarter second, generate a random wave.
 	//
+
 	static float t_base = 0.0f;
 	if ((timer.GetTotalSeconds() - t_base) >= 0.25f)
 	{
 		t_base += 0.25f;
 
-		DWORD i = 5 + rand() % (m_numRows - 10);
-		DWORD j = 5 + rand() % (m_numCols - 10);
-
-		// Don't disturb boundaries.
-		assert(i > 1 && i < m_numRows - 2);
-		assert(j > 1 && j < m_numCols - 2);
-
-		float magnitude = 1.0f + (float)(rand()) / (float)RAND_MAX;
-
-		float halfMag = 0.5f*magnitude;
-
-		// Disturb the ijth vertex height and its neighbors.
-		m_currSolution[i*m_numCols + j].y += magnitude;
-		m_currSolution[i*m_numCols + j + 1].y += halfMag;
-		m_currSolution[i*m_numCols + j - 1].y += halfMag;
-		m_currSolution[(i + 1)*m_numCols + j].y += halfMag;
-		m_currSolution[(i - 1)*m_numCols + j].y += halfMag;
+		DisturbWave();
 	}
 
 	//
 	// Update waves
 	//
 
+	UpdateWave(elapsedTime);
+
+	//
+	// Update the wave vertex buffer with the new solution.
+	//
+
+	D3D11_MAPPED_SUBRESOURCE mappedData;
+	HRESULT hr = m_d3dContext->Map(m_vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData);
+
+	VertexType* v = reinterpret_cast<VertexType*>(mappedData.pData);
+	const UINT vertexCount = m_numRows * m_numCols;
+	for (UINT i = 0; i < vertexCount; ++i)
+	{
+		v[i].position = m_currSolution[i];
+		v[i].color = XMFLOAT4(Colors::Blue);
+		v[i].normal = m_normals[i];
+	}
+
+	m_d3dContext->Unmap(m_vertexBuffer.Get(), 0);
+
+	Super::Update(timer);
+}
+
+void LitWave::DisturbWave()
+{
+	DWORD i = 5 + rand() % (m_numRows - 10);
+	DWORD j = 5 + rand() % (m_numCols - 10);
+
+	// Don't disturb boundaries.
+	assert(i > 1 && i < m_numRows - 2);
+	assert(j > 1 && j < m_numCols - 2);
+
+	float magnitude = 1.0f + (float)(rand()) / (float)RAND_MAX;
+
+	float halfMag = 0.5f*magnitude;
+
+	// Disturb the ijth vertex height and its neighbors.
+	m_currSolution[i*m_numCols + j].y += magnitude;
+	m_currSolution[i*m_numCols + j + 1].y += halfMag;
+	m_currSolution[i*m_numCols + j - 1].y += halfMag;
+	m_currSolution[(i + 1)*m_numCols + j].y += halfMag;
+	m_currSolution[(i - 1)*m_numCols + j].y += halfMag;
+}
+
+void LitWave::UpdateWave(float dt)
+{
 	static float t = 0;
 
 	// Accumulate time.
-	float dt = float(timer.GetElapsedSeconds());
 	t += dt;
 
 	// Only update the simulation at the specified time step.
@@ -406,25 +560,29 @@ void Wave::Update(DX::StepTimer const & timer)
 		std::swap(m_prevSolution, m_currSolution);
 
 		t = 0.0f; // reset time
+
+		//
+		// Compute normals using finite difference scheme.
+		//
+		for (UINT i = 1; i < m_numRows - 1; ++i)
+		{
+			for (UINT j = 1; j < m_numCols - 1; ++j)
+			{
+				float l = m_currSolution[i*m_numCols + j - 1].y;
+				float r = m_currSolution[i*m_numCols + j + 1].y;
+				float t = m_currSolution[(i - 1)*m_numCols + j].y;
+				float b = m_currSolution[(i + 1)*m_numCols + j].y;
+				m_normals[i*m_numCols + j].x = -r + l;
+				m_normals[i*m_numCols + j].y = 2.0f*m_spatialStep;
+				m_normals[i*m_numCols + j].z = b - t;
+
+				XMVECTOR n = XMVector3Normalize(XMLoadFloat3(&m_normals[i*m_numCols + j]));
+				XMStoreFloat3(&m_normals[i*m_numCols + j], n);
+
+				m_tangentX[i*m_numCols + j] = XMFLOAT3(2.0f*m_spatialStep, r - l, 0.0f);
+				XMVECTOR T = XMVector3Normalize(XMLoadFloat3(&m_tangentX[i*m_numCols + j]));
+				XMStoreFloat3(&m_tangentX[i*m_numCols + j], T);
+			}
+		}
 	}
-
-	//
-	// Update the wave vertex buffer with the new solution.
-	//
-
-	D3D11_MAPPED_SUBRESOURCE mappedData;
-	HRESULT hr = m_d3dContext->Map(m_vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData);
-
-	VertexType* v = reinterpret_cast<VertexType*>(mappedData.pData);
-	const UINT vertexCount = m_numRows * m_numCols;
-	for (UINT i = 0; i < vertexCount; ++i)
-	{
-		v[i].position = m_currSolution[i];
-		v[i].color = XMFLOAT4(Colors::Blue);
-		v[i].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	}
-
-	m_d3dContext->Unmap(m_vertexBuffer.Get(), 0);
-
-	Super::Update(timer);
 }
