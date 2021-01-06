@@ -10,9 +10,10 @@
 #include "MultiShapeGame/MultiShapeGame.h"
 #include "HillAndWaveGame/HillAndWaveGame.h"
 #include "LitHillGame/LitHillGame.h"
+#include "TransparentWaveGame/TransparentWaveGame.h"
 
 using namespace DirectX;
-using TargetGame = LitHillGame;
+using TargetGame = TransparentWaveGame;
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wcovered-switch-default"

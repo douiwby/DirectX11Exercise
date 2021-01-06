@@ -46,6 +46,11 @@ protected:
 	virtual void BuildShape();
 	virtual void BuildMaterial();
 
+#if USE_VERTEX_COLOR
+#elif USE_TEXTURE_UV
+	virtual void BuildTexture();
+#endif
+
 	inline float GetHeight(float x, float z) const;
 	inline DirectX::XMFLOAT3 GetHillNormal(float x, float z) const;
 
@@ -70,6 +75,11 @@ protected:
 	virtual void BuildShape();
 	virtual void BuildMaterial();
 
+#if USE_VERTEX_COLOR
+#elif USE_TEXTURE_UV
+	virtual void BuildTexture();
+#endif
+
 	void DisturbWave();
 	void UpdateWave(float dt);
 
@@ -82,11 +92,11 @@ protected:
 	float mK2;
 	float mK3;
 
-	float m_speed = 3.25f;
-	float m_damping = 0.4f;
+	const float m_speed = 3.25f;
+	const float m_damping = 0.4f;
 
-	float m_timeStep = 0.03f;
-	float m_spatialStep = 0.75f;
+	const float m_timeStep = 0.03f;
+	const float m_spatialStep = 0.75f;
 
 	const UINT m_numRows = 201;
 	const UINT m_numCols = 201;

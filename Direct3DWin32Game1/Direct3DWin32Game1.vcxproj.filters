@@ -32,6 +32,9 @@
     <Filter Include="LitHillGame">
       <UniqueIdentifier>{88e57a9f-9d87-4cc9-ba33-b8bdbcacf19a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TransparentWaveGame">
+      <UniqueIdentifier>{ec9b2db4-78cf-47bf-bca8-36517092dd95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -78,6 +81,9 @@
     <ClInclude Include="LitHillGame\LitShape.h">
       <Filter>LitHillGame</Filter>
     </ClInclude>
+    <ClInclude Include="TransparentWaveGame\TransparentWaveGame.h">
+      <Filter>TransparentWaveGame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -121,6 +127,9 @@
     <ClCompile Include="LitHillGame\LitShape.cpp">
       <Filter>LitHillGame</Filter>
     </ClCompile>
+    <ClCompile Include="TransparentWaveGame\TransparentWaveGame.cpp">
+      <Filter>TransparentWaveGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -156,6 +165,9 @@
     </FxCompile>
     <FxCompile Include="LitHillGame\Lighting.hlsl">
       <Filter>LitHillGame</Filter>
+    </FxCompile>
+    <FxCompile Include="TransparentWaveGame\Blending.hlsl">
+      <Filter>TransparentWaveGame</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

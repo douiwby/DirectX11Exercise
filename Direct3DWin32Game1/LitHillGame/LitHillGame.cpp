@@ -4,7 +4,11 @@
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
-using VertexType = VertexPositionNormalColor; // The color is not using
+#ifdef USE_VERTEX_COLOR
+using VertexType = VertexPositionNormalColor; // The color is not using here
+#else
+using VertexType = VertexPositionNormalUV; // The UV is not using here
+#endif
 
 LitHillGame::~LitHillGame()
 {
@@ -12,6 +16,7 @@ LitHillGame::~LitHillGame()
 	{
 		delete (*it);
 	}
+	m_objects.clear();
 }
 
 void LitHillGame::Initialize(HWND window, int width, int height)
@@ -153,6 +158,7 @@ void LitHill::BuildShape()
 
 			vertices[i*n + j].position = XMFLOAT3(x, y, z);
 
+#ifdef USE_VERTEX_COLOR
 			XMFLOAT4 color;
 			if (y < -10.0f)
 			{
@@ -180,6 +186,11 @@ void LitHill::BuildShape()
 				color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 			}
 			vertices[i*n + j].color = color;
+			
+#else
+			vertices[i*n + j].textureUV.x = j * du;
+			vertices[i*n + j].textureUV.y = i * dv;
+#endif
 
 			vertices[i*n + j].normal = GetHillNormal(x, z);
 		}
@@ -363,8 +374,8 @@ void LitWave::BuildShape()
 		for (UINT i = 0; i < vertexCount; ++i)
 		{
 			vertices[i].position = m_currSolution[i];
-			vertices[i].color = XMFLOAT4(Colors::Red);
 			vertices[i].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+			//vertices[i].color = XMFLOAT4(Colors::Red);
 		}
 
 		D3D11_BUFFER_DESC vbDesc2;
@@ -452,7 +463,7 @@ void LitWave::BuildShape()
 void LitWave::BuildMaterial()
 {
 	m_cbPerObject.material.ambient = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
-	m_cbPerObject.material.diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
+	m_cbPerObject.material.diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 0.5f);
 	m_cbPerObject.material.specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 96.0f);
 	m_cbPerObject.material.reflect = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 }
@@ -486,11 +497,23 @@ void LitWave::Update(DX::StepTimer const & timer)
 	HRESULT hr = m_d3dContext->Map(m_vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData);
 
 	VertexType* v = reinterpret_cast<VertexType*>(mappedData.pData);
+
 	const UINT vertexCount = m_numRows * m_numCols;
+	const float width = m_numCols * m_spatialStep;
+	const float depth = m_numRows * m_spatialStep;
+	float totalTime = timer.GetTotalSeconds();
+	float rateU = 0.05f;
+	float rateV = 0.02f;
 	for (UINT i = 0; i < vertexCount; ++i)
 	{
 		v[i].position = m_currSolution[i];
+#ifdef USE_VERTEX_COLOR
 		v[i].color = XMFLOAT4(Colors::Blue);
+#else
+		v[i].textureUV.x = 0.5 + m_currSolution[i].x / width + rateU * totalTime;
+		v[i].textureUV.y = 0.5 - m_currSolution[i].z / depth + rateV * totalTime;
+
+#endif
 		v[i].normal = m_normals[i];
 	}
 
@@ -586,3 +609,18 @@ void LitWave::UpdateWave(float dt)
 		}
 	}
 }
+
+#if USE_VERTEX_COLOR
+#elif USE_TEXTURE_UV
+
+void LitHill::BuildTexture()
+{
+	BuildTextureByName(L"TransparentWaveGame\\grass.dds");
+}
+
+void LitWave::BuildTexture()
+{
+	BuildTextureByName(L"TransparentWaveGame\\water1.dds");
+}
+
+#endif

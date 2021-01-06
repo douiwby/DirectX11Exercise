@@ -75,10 +75,10 @@ void Shape::SetInputLayout()
 	DX::ThrowIfFailed(hr);
 }
 
-void Shape::CreateVSAndPSShader(const std::wstring & vsFilename, const std::wstring & psFilename)
+void Shape::CreateVSAndPSShader(const std::wstring & vsFilename, const std::wstring & psFilename, const D3D_SHADER_MACRO* defines/* = nullptr*/)
 {
-	m_VSByteCode = d3dUtil::CompileShader(vsFilename, nullptr, "VS", "vs_5_0");
-	m_PSByteCode = d3dUtil::CompileShader(psFilename, nullptr, "PS", "ps_5_0");
+	m_VSByteCode = d3dUtil::CompileShader(vsFilename, defines, "VS", "vs_5_0");
+	m_PSByteCode = d3dUtil::CompileShader(psFilename, defines, "PS", "ps_5_0");
 
 	HRESULT hr = m_d3dDevice->CreateVertexShader(m_VSByteCode->GetBufferPointer(), m_VSByteCode->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
 	DX::ThrowIfFailed(hr);

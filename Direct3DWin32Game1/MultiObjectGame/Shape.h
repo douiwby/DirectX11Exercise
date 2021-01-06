@@ -24,5 +24,5 @@ protected:
 	Microsoft::WRL::ComPtr<ID3DBlob> m_VSByteCode;
 	Microsoft::WRL::ComPtr<ID3DBlob> m_PSByteCode;
 
-	virtual void CreateVSAndPSShader(const std::wstring& vsFilename, const std::wstring& psFilename);
+	virtual void CreateVSAndPSShader(const std::wstring& vsFilename, const std::wstring& psFilename, const D3D_SHADER_MACRO* defines = nullptr);
 };

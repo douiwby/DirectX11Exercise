@@ -14,3 +14,10 @@ struct Material
 	DirectX::XMFLOAT4 specular; // w = SpecPower
 	DirectX::XMFLOAT4 reflect;
 };
+
+struct VertexPositionNormalUV
+{
+	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT3 normal;
+	DirectX::XMFLOAT2 textureUV;
+};
