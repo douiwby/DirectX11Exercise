@@ -35,6 +35,9 @@
     <Filter Include="TransparentWaveGame">
       <UniqueIdentifier>{ec9b2db4-78cf-47bf-bca8-36517092dd95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MirrorGame">
+      <UniqueIdentifier>{69500f21-1f1f-4b82-b128-6865742d1617}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -57,32 +60,35 @@
     <ClInclude Include="MultiObjectGame\MultiObjectGame.h">
       <Filter>MultiObjectGame</Filter>
     </ClInclude>
-    <ClInclude Include="MultiObjectGame\RenderObject.h">
-      <Filter>MultiObjectGame</Filter>
-    </ClInclude>
     <ClInclude Include="MultiShapeGame\MultiShapeGame.h">
       <Filter>MultiShapeGame</Filter>
     </ClInclude>
     <ClInclude Include="HillAndWaveGame\HillAndWaveGame.h">
       <Filter>HillAndWaveGame</Filter>
     </ClInclude>
-    <ClInclude Include="MultiObjectGame\VertexStructuer.h">
-      <Filter>MultiObjectGame</Filter>
-    </ClInclude>
     <ClInclude Include="LitHillGame\LitHillGame.h">
-      <Filter>LitHillGame</Filter>
-    </ClInclude>
-    <ClInclude Include="MultiObjectGame\Shape.h">
-      <Filter>MultiObjectGame</Filter>
-    </ClInclude>
-    <ClInclude Include="LitHillGame\LightStructuer.h">
-      <Filter>LitHillGame</Filter>
-    </ClInclude>
-    <ClInclude Include="LitHillGame\LitShape.h">
       <Filter>LitHillGame</Filter>
     </ClInclude>
     <ClInclude Include="TransparentWaveGame\TransparentWaveGame.h">
       <Filter>TransparentWaveGame</Filter>
+    </ClInclude>
+    <ClInclude Include="MirrorGame\MirrorGame.h">
+      <Filter>MirrorGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\VertexStructuer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Shape.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\RenderObject.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\LitShape.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\LightStructuer.h">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -106,9 +112,6 @@
     <ClCompile Include="MultiObjectGame\MultiObjectGame.cpp">
       <Filter>MultiObjectGame</Filter>
     </ClCompile>
-    <ClCompile Include="MultiObjectGame\RenderObject.cpp">
-      <Filter>MultiObjectGame</Filter>
-    </ClCompile>
     <ClCompile Include="MultiShapeGame\MultiShapeGame.cpp">
       <Filter>MultiShapeGame</Filter>
     </ClCompile>
@@ -118,17 +121,20 @@
     <ClCompile Include="LitHillGame\LitHillGame.cpp">
       <Filter>LitHillGame</Filter>
     </ClCompile>
-    <ClCompile Include="MultiObjectGame\Shape.cpp">
-      <Filter>MultiObjectGame</Filter>
-    </ClCompile>
-    <ClCompile Include="LitHillGame\LightStructuer.cpp">
-      <Filter>LitHillGame</Filter>
-    </ClCompile>
-    <ClCompile Include="LitHillGame\LitShape.cpp">
-      <Filter>LitHillGame</Filter>
-    </ClCompile>
     <ClCompile Include="TransparentWaveGame\TransparentWaveGame.cpp">
       <Filter>TransparentWaveGame</Filter>
+    </ClCompile>
+    <ClCompile Include="MirrorGame\MirrorGame.cpp">
+      <Filter>MirrorGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Shape.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\RenderObject.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\LitShape.cpp">
+      <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

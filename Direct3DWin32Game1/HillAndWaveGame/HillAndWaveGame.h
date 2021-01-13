@@ -1,5 +1,5 @@
 #pragma once
-#include "MultiObjectGame/Shape.h"
+#include "Common/Shape.h"
 #include "MultiObjectGame/MultiObjectGame.h"
 
 class HillAndWaveGame : public MultiObjectGame

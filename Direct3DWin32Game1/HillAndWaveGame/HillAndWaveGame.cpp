@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "HillAndWaveGame\HillAndWaveGame.h"
-#include "MultiObjectGame/VertexStructuer.h"
+#include "Common/VertexStructuer.h"
 #include <time.h>
 
 using namespace DirectX;

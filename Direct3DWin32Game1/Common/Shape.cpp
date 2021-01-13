@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "MultiObjectGame/Shape.h"
-#include "MultiObjectGame/VertexStructuer.h"
+#include "Common/Shape.h"
+#include "Common/VertexStructuer.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;

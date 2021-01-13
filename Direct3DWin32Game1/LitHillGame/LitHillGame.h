@@ -1,8 +1,8 @@
 #pragma once
 #include "MultiObjectGame/MultiObjectGame.h"
-#include "LitHillGame/LitShape.h"
-#include "MultiObjectGame/VertexStructuer.h"
-#include "LitHillGame/LightStructuer.h"
+#include "Common/LitShape.h"
+#include "Common/VertexStructuer.h"
+#include "Common/LightStructuer.h"
 
 class LitHillGame : public MultiObjectGame
 {

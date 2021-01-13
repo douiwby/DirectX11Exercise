@@ -172,13 +172,14 @@
     <ClInclude Include="HillAndWaveGame\HillAndWaveGame.h" />
     <ClInclude Include="HillGame\HillGame.h" />
     <ClInclude Include="InitGame\InitGame.h" />
-    <ClInclude Include="LitHillGame\LightStructuer.h" />
+    <ClInclude Include="Common\LightStructuer.h" />
     <ClInclude Include="LitHillGame\LitHillGame.h" />
-    <ClInclude Include="LitHillGame\LitShape.h" />
+    <ClInclude Include="Common\LitShape.h" />
+    <ClInclude Include="MirrorGame\MirrorGame.h" />
     <ClInclude Include="MultiObjectGame\MultiObjectGame.h" />
-    <ClInclude Include="MultiObjectGame\RenderObject.h" />
-    <ClInclude Include="MultiObjectGame\Shape.h" />
-    <ClInclude Include="MultiObjectGame\VertexStructuer.h" />
+    <ClInclude Include="Common\RenderObject.h" />
+    <ClInclude Include="Common\Shape.h" />
+    <ClInclude Include="Common\VertexStructuer.h" />
     <ClInclude Include="MultiShapeGame\MultiShapeGame.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="StepTimer.h" />
@@ -191,13 +192,13 @@
     <ClCompile Include="HillAndWaveGame\HillAndWaveGame.cpp" />
     <ClCompile Include="HillGame\HillGame.cpp" />
     <ClCompile Include="InitGame\InitGame.cpp" />
-    <ClCompile Include="LitHillGame\LightStructuer.cpp" />
     <ClCompile Include="LitHillGame\LitHillGame.cpp" />
-    <ClCompile Include="LitHillGame\LitShape.cpp" />
+    <ClCompile Include="Common\LitShape.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MirrorGame\MirrorGame.cpp" />
     <ClCompile Include="MultiObjectGame\MultiObjectGame.cpp" />
-    <ClCompile Include="MultiObjectGame\RenderObject.cpp" />
-    <ClCompile Include="MultiObjectGame\Shape.cpp" />
+    <ClCompile Include="Common\RenderObject.cpp" />
+    <ClCompile Include="Common\Shape.cpp" />
     <ClCompile Include="MultiShapeGame\MultiShapeGame.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

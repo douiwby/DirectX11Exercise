@@ -1,6 +1,6 @@
 #pragma once
-#include "MultiObjectGame/Shape.h"
-#include "MultiObjectGame/VertexStructuer.h"
+#include "Common/Shape.h"
+#include "Common/VertexStructuer.h"
 
 //#define USE_VERTEX_COLOR 1
 #define USE_TEXTURE_UV 1

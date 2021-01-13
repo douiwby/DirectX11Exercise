@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "LitHillGame/LitShape.h"
+#include "Common/LitShape.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;

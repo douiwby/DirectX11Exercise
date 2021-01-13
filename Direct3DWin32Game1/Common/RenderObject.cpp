@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "MultiObjectGame/RenderObject.h"
+#include "Common/RenderObject.h"
 
 using namespace DirectX;
 

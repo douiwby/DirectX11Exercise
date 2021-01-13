@@ -1,7 +1,7 @@
 #pragma once
 #include "InitGame/InitGame.h"
 #include "Common/d3dUtil.h"
-#include "MultiObjectGame/RenderObject.h"
+#include "Common/RenderObject.h"
 #include <vector>
 
 class MultiObjectGame : public InitGame

@@ -1,5 +1,5 @@
 #pragma once
-#include "MultiObjectGame/RenderObject.h"
+#include "Common/RenderObject.h"
 #include "MultiObjectGame/MultiObjectGame.h"
 
 #include "BoxGame/BoxGame.h"
