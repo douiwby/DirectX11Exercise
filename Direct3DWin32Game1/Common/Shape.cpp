@@ -17,6 +17,7 @@ void Shape::Initialize(
 	BuildShader();
 	SetInputLayout();
 	BuildShape();
+	BuildConstantBuffer();
 }
 
 // Updates the model.

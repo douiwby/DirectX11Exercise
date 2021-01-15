@@ -173,6 +173,12 @@ void Hill::BuildShape()
 	hr = m_d3dDevice->CreateBuffer(&ibDesc, &ibInitData, m_indexBuffer.GetAddressOf());
 	DX::ThrowIfFailed(hr);
 
+	delete[] vertices;
+	delete[] indices;
+}
+
+void Hill::BuildConstantBuffer()
+{
 	// Set constant buffer
 	D3D11_BUFFER_DESC cbDesc;
 	cbDesc.ByteWidth = sizeof(XMFLOAT4X4);
@@ -182,11 +188,8 @@ void Hill::BuildShape()
 	cbDesc.MiscFlags = 0;
 	cbDesc.StructureByteStride = 0;
 
-	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
+	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
 	DX::ThrowIfFailed(hr);
-
-	delete[] vertices;
-	delete[] indices;
 }
 
 Wave::Wave()
@@ -316,6 +319,14 @@ void Wave::BuildShape()
 	hr = m_d3dDevice->CreateBuffer(&ibDesc, &ibInitData, m_indexBuffer.GetAddressOf());
 	DX::ThrowIfFailed(hr);
 
+	delete[] indices;
+
+	time_t t;
+	srand((unsigned) time(&t));
+}
+
+void Wave::BuildConstantBuffer()
+{
 	// Set constant buffer
 	D3D11_BUFFER_DESC cbDesc;
 	cbDesc.ByteWidth = sizeof(XMFLOAT4X4);
@@ -325,13 +336,8 @@ void Wave::BuildShape()
 	cbDesc.MiscFlags = 0;
 	cbDesc.StructureByteStride = 0;
 
-	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
+	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
 	DX::ThrowIfFailed(hr);
-
-	delete[] indices;
-
-	time_t t;
-	srand((unsigned) time(&t));
 }
 
 void Wave::Update(DX::StepTimer const & timer)

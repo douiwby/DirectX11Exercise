@@ -20,6 +20,7 @@ protected:
 	virtual void BuildShader();
 	virtual void SetInputLayout();
 	virtual void BuildShape() = 0;
+	virtual void BuildConstantBuffer() = 0;
 
 	Microsoft::WRL::ComPtr<ID3DBlob> m_VSByteCode;
 	Microsoft::WRL::ComPtr<ID3DBlob> m_PSByteCode;

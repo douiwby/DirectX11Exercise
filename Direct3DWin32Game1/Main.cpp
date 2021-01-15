@@ -11,9 +11,10 @@
 #include "HillAndWaveGame/HillAndWaveGame.h"
 #include "LitHillGame/LitHillGame.h"
 #include "TransparentWaveGame/TransparentWaveGame.h"
+#include "MirrorGame/MirrorGame.h"
 
 using namespace DirectX;
-using TargetGame = TransparentWaveGame;
+using TargetGame = MirrorGame;
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
@@ -279,7 +280,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		game->OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		break;
 	case WM_KEYUP:
-		// For the key map
+		// Key map
 		// https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 		if (wParam == 0x46) // F key
 		{

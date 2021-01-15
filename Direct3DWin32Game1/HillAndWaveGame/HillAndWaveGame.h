@@ -18,6 +18,7 @@ class Hill : public Shape
 
 protected:
 	virtual void BuildShape();
+	virtual void BuildConstantBuffer();
 
 	inline float GetHeight(float x, float z) const;
 	inline DirectX::XMFLOAT3 GetHillNormal(float x, float z) const;
@@ -39,6 +40,7 @@ public:
 
 protected:	
 	virtual void BuildShape();
+	virtual void BuildConstantBuffer();
 
 	DirectX::XMFLOAT3* m_prevSolution;
 	DirectX::XMFLOAT3* m_currSolution;

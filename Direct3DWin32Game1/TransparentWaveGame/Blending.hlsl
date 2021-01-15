@@ -71,13 +71,13 @@ VertexOut VS(VertexIn vin)
   
 float4 PS(VertexOut pin) : SV_Target
 {
-	float4 sampledDiffuse = gDiffuseMap.Sample(gSampler, pin.TexUV);
+	float4 texColor = gDiffuseMap.Sample(gSampler, pin.TexUV);
 
 #ifdef ALPHA_TEST
 	// Discard pixel if texture alpha < 0.1.  We do this test as soon 
 	// as possible in the shader so that we can potentially exit the
 	// shader early, thereby skipping the rest of the shader code.
-	clip(sampledDiffuse.a - 0.1f);
+	clip(texColor.a - 0.1f);
 #endif
 
 	// Interpolating normal can unnormalize it, so normalize it.
@@ -93,28 +93,26 @@ float4 PS(VertexOut pin) : SV_Target
 	float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	float4 spec    = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	Material mat = gMaterial;
-	mat.Diffuse = sampledDiffuse;
-
 	// Sum the light contribution from each light source.
 	float4 A, D, S;
 
-	ComputeDirectionalLight(mat, gDirLight, pin.NormalW, toEyeW, A, D, S);
+	ComputeDirectionalLight(gMaterial, gDirLight, pin.NormalW, toEyeW, A, D, S);
 	ambient += A;  
 	diffuse += D;
 	spec    += S;
 
-	ComputePointLight(mat, gPointLight, pin.PosW, pin.NormalW, toEyeW, A, D, S);
+	ComputePointLight(gMaterial, gPointLight, pin.PosW, pin.NormalW, toEyeW, A, D, S);
 	ambient += A;
 	diffuse += D;
 	spec    += S;
 
-	ComputeSpotLight(mat, gSpotLight, pin.PosW, pin.NormalW, toEyeW, A, D, S);
+	ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, pin.NormalW, toEyeW, A, D, S);
 	ambient += A;
 	diffuse += D;
 	spec    += S;
-	   
-	float4 litColor = ambient + diffuse + spec;
+	
+	float4 litColor = texColor * (ambient + diffuse) + spec;
+	//litColor = texColor;
 
 #ifdef FOG
 	// Blend the fog color and the lit color.

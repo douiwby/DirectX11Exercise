@@ -55,10 +55,10 @@ void LitShape::Update(DX::StepTimer const & timer)
 	XMMATRIX view = XMLoadFloat4x4(m_view);
 	XMMATRIX proj = XMLoadFloat4x4(m_proj);
 
+	XMMATRIX worldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, view), proj);
 	world.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 	XMVECTOR det = XMMatrixDeterminant(world);
 	XMMATRIX worldInvTranspose = XMMatrixTranspose(XMMatrixInverse(&det, world));
-	XMMATRIX worldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, view), proj);
 
 	// Use XMMatrixTranspose before send to GPU due to HLSL using column-major
 	XMStoreFloat4x4(&m_cbPerObject.world, XMMatrixTranspose(world));
@@ -121,11 +121,27 @@ void LitShape::SetInputLayout()
 void LitShape::BuildMaterial()
 {
 	// Default material
-	m_cbPerObject.material.ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-	m_cbPerObject.material.diffuse = XMFLOAT4(Colors::Gray);
+	m_cbPerObject.material.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_cbPerObject.material.diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	m_cbPerObject.material.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 	m_cbPerObject.material.reflect = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 }
+
+void LitShape::BuildConstantBuffer()
+{
+	// Set constant buffer
+	D3D11_BUFFER_DESC cbDesc;
+	cbDesc.ByteWidth = sizeof(cbPerObjectStruct);
+	cbDesc.Usage = D3D11_USAGE_DEFAULT;
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.CPUAccessFlags = 0;
+	cbDesc.MiscFlags = 0;
+	cbDesc.StructureByteStride = 0;
+
+	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+}
+
 #if USE_VERTEX_COLOR
 #elif USE_TEXTURE_UV
 void LitShape::BuildTextureByName(const wchar_t * fileName)

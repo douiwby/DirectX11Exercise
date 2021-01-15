@@ -15,6 +15,7 @@ LitHillGame::~LitHillGame()
 	for (auto it = m_objects.begin(); it != m_objects.end(); ++it)
 	{
 		delete (*it);
+		*it = nullptr;
 	}
 	m_objects.clear();
 }

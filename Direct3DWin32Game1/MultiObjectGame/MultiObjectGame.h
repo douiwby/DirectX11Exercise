@@ -18,5 +18,8 @@ protected:
 
 	virtual void Update(DX::StepTimer const& timer);
 
+	virtual void PreObjectsRender() {}
+	virtual void PostObjectsRender() {}
+
 	std::vector<RenderObject*> m_objects;
 };

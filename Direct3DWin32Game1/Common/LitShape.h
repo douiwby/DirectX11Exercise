@@ -24,6 +24,7 @@ protected:
 	virtual void BuildShader();
 	virtual void SetInputLayout();
 	virtual void BuildMaterial();
+	virtual void BuildConstantBuffer();
 
 #if USE_VERTEX_COLOR
 #elif USE_TEXTURE_UV
