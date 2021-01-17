@@ -28,8 +28,8 @@ void MirrorGame::Initialize(HWND window, int width, int height)
 	m_objects.push_back(wall);
 	m_objects.push_back(floor);
 	m_objects.push_back(crate);
-	m_reflectObjects.push_back(crate);
 	m_reflectObjects.push_back(floor);
+	m_reflectObjects.push_back(crate);
 	mirror = new Mirror();
 
 	m_initCameraY = 20.f;
@@ -158,7 +158,9 @@ void MirrorGame::PostObjectsRender()
 
 	UINT stencilRef = 1;
 
+	// -----------------------------
 	// Render the mirror to get the stencil
+	// -----------------------------
 
 	CD3D11_DEPTH_STENCIL_DESC mirrorDesc(D3D11_DEFAULT);
 	mirrorDesc.DepthEnable = TRUE;
@@ -173,7 +175,9 @@ void MirrorGame::PostObjectsRender()
 
 	mirror->Render();
 
+	// -----------------------------
 	// Use stencil to render other objects
+	// -----------------------------
 
 	// Because all the objects is behind the wall, so close depth test here or they won't draw.
 	CD3D11_DEPTH_STENCIL_DESC reflectObjecDesc(D3D11_DEFAULT);
@@ -189,29 +193,16 @@ void MirrorGame::PostObjectsRender()
 	// Note you shouldn't draw normal objects after this because depth information has lost already!!!
 	reflectObjecDesc.DepthEnable = TRUE;
 	m_d3dContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-	// Even in this way, the order(in MirrorGame::Initialize) is important,
-	// because the blend is open, it will be transparent if draw near object last.
 
 	ComPtr<ID3D11DepthStencilState> mReflectObjectState;
 	hr = m_d3dDevice->CreateDepthStencilState(&reflectObjecDesc, mReflectObjectState.GetAddressOf());
 	DX::ThrowIfFailed(hr);
 	m_d3dContext->OMSetDepthStencilState(mReflectObjectState.Get(), stencilRef);
 
-	// Enable blend to render the object
-	CD3D11_BLEND_DESC reflectBlendDesc(D3D11_DEFAULT);
-	reflectBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-	reflectBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_BLEND_FACTOR;
-	reflectBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_BLEND_FACTOR;
-	reflectBlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	reflectBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	reflectBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	reflectBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-
-	ComPtr<ID3D11BlendState> mReflectBlendState;
-	hr = m_d3dDevice->CreateBlendState(&reflectBlendDesc, mReflectBlendState.GetAddressOf());
-	DX::ThrowIfFailed(hr);
-	float blendFactors[] = { 0.85f,0.85f,0.85f,1.f };
-	m_d3dContext->OMSetBlendState(mReflectBlendState.Get(), blendFactors, UINT_MAX);
+	// The normal of triangles won't change after reflect,
+	// so enable counter clockwise to cull back face correctly.
+	ComPtr<ID3D11RasterizerState> previousState;
+	m_d3dContext->RSGetState(previousState.GetAddressOf());
 
 	CD3D11_RASTERIZER_DESC reflectRasterizerDesc(D3D11_DEFAULT);
 	reflectRasterizerDesc.FrontCounterClockwise = TRUE;
@@ -251,6 +242,30 @@ void MirrorGame::PostObjectsRender()
 		XMStoreFloat4x4((*it)->m_world, world);
 	}
 
+	m_d3dContext->RSSetState(previousState.Get());
+
+	// -----------------------------
+	// Render the mirror normally at last
+	// -----------------------------
+
+	// Enable blend to render the object
+	CD3D11_BLEND_DESC reflectBlendDesc(D3D11_DEFAULT);
+	reflectBlendDesc.RenderTarget[0].BlendEnable = TRUE;
+	reflectBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_BLEND_FACTOR;
+	reflectBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_BLEND_FACTOR;
+	reflectBlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	reflectBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	reflectBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	reflectBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+
+	ComPtr<ID3D11BlendState> mReflectBlendState;
+	hr = m_d3dDevice->CreateBlendState(&reflectBlendDesc, mReflectBlendState.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+	float blendFactors[] = { 0.15f,0.15f,0.15f,1.f };
+	m_d3dContext->OMSetBlendState(mReflectBlendState.Get(), blendFactors, UINT_MAX);
+
+	mirror->Render();
+
 	// Restore the light
 	XMStoreFloat3(&m_spotLight.Direction, dir);
 	XMStoreFloat3(&m_spotLight.Position, pos);
@@ -258,7 +273,6 @@ void MirrorGame::PostObjectsRender()
 	// Clear the state
 	m_d3dContext->OMSetDepthStencilState(nullptr, 0);
 	m_d3dContext->OMSetBlendState(nullptr, blendFactors, UINT_MAX);
-	m_d3dContext->RSSetState(nullptr);
 }
 
 inline void MirrorGame::RotateVectorByZAxis(DirectX::XMFLOAT3& vector, float rotateRadian)
