@@ -40,6 +40,7 @@ protected:
 	SpotLight m_spotLight;
 
 	RenderObject* mirror;
+	class LitCrateShadow* shadow;
 	std::vector<class ReflectShape*> m_reflectObjects;
 
 private:
@@ -110,4 +111,15 @@ protected:
 
 	virtual void BuildShape();
 	virtual void BuildTexture();
+	virtual void BuildMaterial();
+};
+
+class LitCrateShadow : public LitCrate
+{
+	using Super = LitCrate;
+	friend class MirrorGame;
+
+protected:
+
+	virtual void BuildMaterial();
 };

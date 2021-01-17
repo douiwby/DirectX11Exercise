@@ -15,6 +15,8 @@ MirrorGame::~MirrorGame()
 	}
 	delete mirror;
 	mirror = nullptr;
+	delete shadow;
+	shadow = nullptr;
 
 	m_objects.clear();
 	m_reflectObjects.clear();
@@ -31,6 +33,7 @@ void MirrorGame::Initialize(HWND window, int width, int height)
 	m_reflectObjects.push_back(floor);
 	m_reflectObjects.push_back(crate);
 	mirror = new Mirror();
+	shadow = new LitCrateShadow();
 
 	m_initCameraY = 20.f;
 	m_initCameraZ = -20.f;
@@ -39,6 +42,7 @@ void MirrorGame::Initialize(HWND window, int width, int height)
 
 	Super::Initialize(window, width, height);
 	mirror->Initialize(m_d3dDevice, m_d3dContext, &m_view, &m_proj);
+	shadow->Initialize(m_d3dDevice, m_d3dContext, &m_view, &m_proj);
 
 	BuildLight();
 }
@@ -49,7 +53,7 @@ void MirrorGame::BuildLight()
 	m_dirLight.Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	m_dirLight.Diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	m_dirLight.Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	m_dirLight.Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+	m_dirLight.Direction = XMFLOAT3(0.57735f, -0.57735f, 0.4f);
 
 	// Point light--position is changed every frame to animate in UpdateScene function.
 	m_pointLight.Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
@@ -154,13 +158,60 @@ void MirrorGame::PreObjectsRender()
 
 void MirrorGame::PostObjectsRender()
 {
-	m_d3dContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_STENCIL, 1.0f, 0);
+	// -----------------------------
+	// Render the shadow of box
+	// -----------------------------
 
-	UINT stencilRef = 1;
+	CD3D11_DEPTH_STENCIL_DESC noDoubleBlendDesc(D3D11_DEFAULT);
+	noDoubleBlendDesc.StencilEnable = TRUE;
+	noDoubleBlendDesc.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
+	noDoubleBlendDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_INCR;
+
+	ComPtr<ID3D11DepthStencilState> mShadowState;
+	HRESULT hr = m_d3dDevice->CreateDepthStencilState(&noDoubleBlendDesc, mShadowState.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+
+	CD3D11_BLEND_DESC shadowBlendDesc(D3D11_DEFAULT);
+	shadowBlendDesc.RenderTarget[0].BlendEnable = TRUE;
+	shadowBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	shadowBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	shadowBlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	shadowBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	shadowBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	shadowBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+
+	ComPtr<ID3D11BlendState> mShadowtBlendState;
+	hr = m_d3dDevice->CreateBlendState(&shadowBlendDesc, mShadowtBlendState.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+
+	m_d3dContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_d3dContext->OMSetDepthStencilState(mShadowState.Get(), 0);
+	float blendFactorsShadow[] = { 0.f,0.f,0.f,1.f };
+	m_d3dContext->OMSetBlendState(mShadowtBlendState.Get(), blendFactorsShadow, UINT_MAX);
+
+	XMVECTOR shadowPlane = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+	XMVECTOR toDirLight = -XMLoadFloat3(&m_dirLight.Direction);
+	XMMATRIX shadowMatrix = XMMatrixShadow(shadowPlane, toDirLight);
+	XMMATRIX shadowOffsetY = XMMatrixTranslation(0.f, 0.001f, 0.f);
+
+	XMMATRIX origionalWorld = XMLoadFloat4x4(shadow->m_world);
+	XMMATRIX shadowWorld = origionalWorld * shadowMatrix * shadowOffsetY;
+
+	XMStoreFloat4x4(shadow->m_world, shadowWorld);
+
+	shadow->Update(m_timer);
+	shadow->Render();
+
+	m_d3dContext->OMSetDepthStencilState(nullptr, 0);
+	m_d3dContext->OMSetBlendState(nullptr, blendFactorsShadow, UINT_MAX);
 
 	// -----------------------------
 	// Render the mirror to get the stencil
 	// -----------------------------
+
+	m_d3dContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	UINT stencilRef = 1;
 
 	CD3D11_DEPTH_STENCIL_DESC mirrorDesc(D3D11_DEFAULT);
 	mirrorDesc.DepthEnable = TRUE;
@@ -169,7 +220,7 @@ void MirrorGame::PostObjectsRender()
 	mirrorDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
 	ComPtr<ID3D11DepthStencilState> mMirrorState;
-	HRESULT hr = m_d3dDevice->CreateDepthStencilState(&mirrorDesc, mMirrorState.GetAddressOf());
+	/*HRESULT*/ hr = m_d3dDevice->CreateDepthStencilState(&mirrorDesc, mMirrorState.GetAddressOf());
 	DX::ThrowIfFailed(hr);
 	m_d3dContext->OMSetDepthStencilState(mMirrorState.Get(), stencilRef);
 
@@ -242,7 +293,36 @@ void MirrorGame::PostObjectsRender()
 		XMStoreFloat4x4((*it)->m_world, world);
 	}
 
+	// Render the reflect shadow
+	{	
+		float blendFactorsShadow[] = { 0.f,0.f,0.f,1.f };
+		m_d3dContext->OMSetBlendState(mShadowtBlendState.Get(), blendFactorsShadow, UINT_MAX);
+
+		XMVECTOR shadowPlane = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+		XMVECTOR toDirLight = -XMLoadFloat3(&m_dirLight.Direction);
+		XMMATRIX shadowMatrix = XMMatrixShadow(shadowPlane, toDirLight);
+		XMMATRIX shadowOffsetY = XMMatrixTranslation(0.f, 0.001f, 0.f);
+
+		XMMATRIX origionalWorld = XMLoadFloat4x4(shadow->m_world);
+		XMMATRIX shadowWorld = origionalWorld * shadowMatrix * shadowOffsetY;
+
+		XMStoreFloat4x4(shadow->m_world, shadowWorld);
+
+		// Reflect objects
+		XMMATRIX world = XMLoadFloat4x4(shadow->m_world);
+		XMMATRIX reflectWorld = XMMatrixMultiply(world, reflectMatrix);
+		XMStoreFloat4x4(shadow->m_world, reflectWorld);
+
+		shadow->Update(m_timer);
+		shadow->Render();
+
+		m_d3dContext->OMSetBlendState(nullptr, blendFactorsShadow, UINT_MAX);
+	}
+
 	m_d3dContext->RSSetState(previousState.Get());
+
+	// Restore the shadow's world matrix
+	XMStoreFloat4x4(shadow->m_world, origionalWorld);
 
 	// -----------------------------
 	// Render the mirror normally at last
@@ -251,8 +331,10 @@ void MirrorGame::PostObjectsRender()
 	// Enable blend to render the object
 	CD3D11_BLEND_DESC reflectBlendDesc(D3D11_DEFAULT);
 	reflectBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-	reflectBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_BLEND_FACTOR;
-	reflectBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_BLEND_FACTOR;
+	//reflectBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_BLEND_FACTOR;
+	//reflectBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_BLEND_FACTOR;
+	reflectBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	reflectBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	reflectBlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 	reflectBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
 	reflectBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
@@ -582,11 +664,25 @@ void Mirror::BuildShape()
 	Super::BuildShape();
 
 	XMMATRIX world = XMLoadFloat4x4(m_world);
-	world = XMMatrixMultiply(world, XMMatrixTranslation(0.f, 0.f, -0.01f));
+	world = XMMatrixMultiply(world, XMMatrixTranslation(0.f, 0.f, -0.001f));
 	XMStoreFloat4x4(m_world, world);
 }
 
 void Mirror::BuildTexture()
 {
 	BuildTextureByName(L"MirrorGame\\ice.dds");
+}
+
+void Mirror::BuildMaterial()
+{
+	m_cbPerObject.material.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_cbPerObject.material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.15f);
+	m_cbPerObject.material.specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 16.0f);
+}
+
+void LitCrateShadow::BuildMaterial()
+{
+	m_cbPerObject.material.ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	m_cbPerObject.material.diffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.5f);
+	m_cbPerObject.material.specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 16.0f);
 }
