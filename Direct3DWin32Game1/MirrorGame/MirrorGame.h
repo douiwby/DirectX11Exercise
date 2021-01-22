@@ -11,19 +11,21 @@ public:
 
 	virtual ~MirrorGame();
 
-	virtual void Initialize(HWND window, int width, int height);
+	virtual void Initialize(HWND window, int width, int height) override;
 
 protected:
 
+	virtual void Update(DX::StepTimer const& timer) override;
+
+	virtual void PreObjectsRender() override;
+
+	virtual void PostObjectsRender() override;
+
+	virtual void AddObjects() override;
+
 	virtual void BuildLight();
 
-	virtual void Update(DX::StepTimer const& timer);
-
 	virtual void UpdateLightPosition(DX::StepTimer const& timer);
-
-	virtual void PreObjectsRender();
-
-	virtual void PostObjectsRender();
 
 	struct cbPerFrame
 	{

@@ -9,16 +9,20 @@ MultiShapeGame::~MultiShapeGame()
 	for (auto it = m_objects.begin(); it != m_objects.end(); ++it)
 	{
 		delete (*it);
+		*it = nullptr;
 	}
 }
 
 void MultiShapeGame::Initialize(HWND window, int width, int height)
 {
+	Super::Initialize(window, width, height);
+}
+
+void MultiShapeGame::AddObjects()
+{
 	m_objects.push_back(new Box());
 	m_objects.push_back(new Box2());
 	m_objects.push_back(new Pyramid());
-
-	Super::Initialize(window, width, height);
 }
 
 void Box::Initialize(

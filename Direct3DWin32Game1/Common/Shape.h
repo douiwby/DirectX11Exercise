@@ -10,10 +10,10 @@ public:
 		Microsoft::WRL::ComPtr<ID3D11Device>& device,
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context,
 		DirectX::XMFLOAT4X4* view,
-		DirectX::XMFLOAT4X4* proj);
+		DirectX::XMFLOAT4X4* proj) override;
 
-	virtual void Update(DX::StepTimer const& timer);
-	virtual void Render();
+	virtual void Update(DX::StepTimer const& timer) override;
+	virtual void Render() override;
 
 protected:
 
@@ -25,5 +25,6 @@ protected:
 	Microsoft::WRL::ComPtr<ID3DBlob> m_VSByteCode;
 	Microsoft::WRL::ComPtr<ID3DBlob> m_PSByteCode;
 
-	virtual void CreateVSAndPSShader(const std::wstring& vsFilename, const std::wstring& psFilename, const D3D_SHADER_MACRO* defines = nullptr);
+	void CreateVSAndPSShader(const std::wstring& vsFilename, const std::wstring& psFilename, const D3D_SHADER_MACRO* defines = nullptr);
+	void CreateConstantBuffer(UINT bufferSize);
 };

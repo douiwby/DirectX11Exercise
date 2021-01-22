@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "LitHillGame/LitHillGame.h"
-#include <time.h>
+#include <ctime>
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -14,17 +14,17 @@ LitHillGame::~LitHillGame()
 {
 	for (auto it = m_objects.begin(); it != m_objects.end(); ++it)
 	{
-		delete (*it);
-		*it = nullptr;
+		if (*it)
+		{
+			delete (*it);
+			*it = nullptr;
+		}
 	}
 	m_objects.clear();
 }
 
 void LitHillGame::Initialize(HWND window, int width, int height)
 {
-	m_objects.push_back(new LitHill());
-	m_objects.push_back(new LitWave());
-
 	m_initCameraY = 150.f;
 	m_initCameraZ = -150.f;
 	m_maxRadius = 300.f;
@@ -58,6 +58,7 @@ void LitHillGame::BuildLight()
 	m_spotLight.Spot = 96.0f;
 	m_spotLight.Range = 1000.0f;
 	m_spotLight.Position = XMFLOAT3(0.0f, 100.0f, 0.0f);
+	m_spotLight.Direction = XMFLOAT3(0.0f, -1.0f, 0.0f);
 
 	m_cbPerFrame.dirLight = m_dirLight;
 	m_cbPerFrame.pointLight = m_pointLight;
@@ -90,6 +91,12 @@ void LitHillGame::Update(DX::StepTimer const & timer)
 	m_d3dContext->UpdateSubresource(m_constantBufferPerFrame.Get(), 0, nullptr, &m_cbPerFrame, 0, 0);
 }
 
+void LitHillGame::AddObjects()
+{
+	m_objects.push_back(new LitHill());
+	m_objects.push_back(new LitWave());
+}
+
 void LitHillGame::UpdateLightPosition(DX::StepTimer const & timer)
 {
 	float elapsedTime = float(timer.GetElapsedSeconds());
@@ -102,13 +109,9 @@ void LitHillGame::UpdateLightPosition(DX::StepTimer const & timer)
 	float z = m_pointLight.Position.z;
 	m_pointLight.Position.y = fmaxf(0.3f*(z*sinf(0.1f*x) + x * cosf(0.1f*z)), -3.0f) + 10.0f;
 
-	// The spotlight takes on the camera position and is aimed in the
-	// same direction the camera is looking.  In this way, it looks
-	// like we are holding a flashlight.
-	//m_spotLight.Position = XMFLOAT3(m_eyePos.x, m_eyePos.y, m_eyePos.z);
-	//XMVECTOR pos = XMVectorSet(m_eyePos.x, m_eyePos.y, m_eyePos.z, 1.0f);
-	//XMVECTOR target = XMVectorZero();
-	//XMStoreFloat3(&m_spotLight.Direction, XMVector3Normalize(target - pos));
+	// Control the spot light by keyboard.
+	// Key map
+	// https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 
 	// Use keyboard to control the position
 	float movingSpeed = 40.0f;
@@ -116,6 +119,7 @@ void LitHillGame::UpdateLightPosition(DX::StepTimer const & timer)
 	{
 		m_spotLight.Position.x -= movingSpeed * elapsedTime;
 	}
+
 	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
 		m_spotLight.Position.x += movingSpeed * elapsedTime;
 
@@ -124,7 +128,59 @@ void LitHillGame::UpdateLightPosition(DX::StepTimer const & timer)
 
 	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
 		m_spotLight.Position.z -= movingSpeed * elapsedTime;
-	m_spotLight.Direction = XMFLOAT3(0.0f, -1.0f, 0.0f);
+
+	float rotateSpeed = 45.f / 180.f * XM_PI;
+	if (GetAsyncKeyState(0x41) & 0x8000)  // A key
+	{
+		float theta = -rotateSpeed * elapsedTime;
+		RotateVectorByZAxis(m_spotLight.Direction, theta);
+	}
+	if (GetAsyncKeyState(0x44) & 0x8000)  // D key
+	{
+		float theta = rotateSpeed * elapsedTime;
+		RotateVectorByZAxis(m_spotLight.Direction, theta);
+	}
+	if (GetAsyncKeyState(0x57) & 0x8000)  // W key
+	{
+		float theta = -rotateSpeed * elapsedTime;
+		RotateVectorByXAxis(m_spotLight.Direction, theta);
+	}
+	if (GetAsyncKeyState(0x53) & 0x8000)  // S key
+	{
+		float theta = rotateSpeed * elapsedTime;
+		RotateVectorByXAxis(m_spotLight.Direction, theta);
+	}
+}
+
+inline void LitHillGame::RotateVectorByZAxis(DirectX::XMFLOAT3& vector, float rotateRadian)
+{
+	XMFLOAT4X4 rotation =
+	{
+		cosf(rotateRadian),sinf(rotateRadian),0.f,0.f,
+		-sinf(rotateRadian),cosf(rotateRadian),0.f,0.f,
+		0.f,0.f,1.f,0.f,
+		0.f,0.f,0.f,1.f
+	};
+	RotateVector(vector, rotation);
+}
+
+inline void LitHillGame::RotateVectorByXAxis(DirectX::XMFLOAT3 & vector, float rotateRadian)
+{
+	XMFLOAT4X4 rotation =
+	{
+		1.f,0.f,0.f,0.f,
+		0.f,cosf(rotateRadian),sinf(rotateRadian),0.f,
+		0.f,-sinf(rotateRadian),cosf(rotateRadian),0.f,
+		0.f,0.f,0.f,1.f
+	};
+	RotateVector(vector, rotation);
+}
+
+inline void LitHillGame::RotateVector(DirectX::XMFLOAT3& vector, DirectX::XMFLOAT4X4& rotation)
+{
+	XMVECTOR dir = XMLoadFloat3(&vector);
+	dir = XMVector3Transform(dir, XMLoadFloat4x4(&rotation));
+	XMStoreFloat3(&vector, dir);
 }
 
 void LitHill::BuildShape()

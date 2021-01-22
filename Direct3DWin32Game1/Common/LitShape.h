@@ -14,17 +14,17 @@ public:
 		Microsoft::WRL::ComPtr<ID3D11Device>& device,
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context,
 		DirectX::XMFLOAT4X4* view,
-		DirectX::XMFLOAT4X4* proj);
+		DirectX::XMFLOAT4X4* proj) override;
 
-	virtual void Update(DX::StepTimer const& timer);
-	virtual void Render();
+	virtual void Update(DX::StepTimer const& timer) override;
+	virtual void Render() override;
 
 protected:
 
-	virtual void BuildShader();
-	virtual void SetInputLayout();
+	virtual void BuildShader() override;
+	virtual void SetInputLayout() override;
+	virtual void BuildConstantBuffer() override;
 	virtual void BuildMaterial();
-	virtual void BuildConstantBuffer();
 
 #if USE_VERTEX_COLOR
 #elif USE_TEXTURE_UV

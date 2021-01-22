@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "HillAndWaveGame\HillAndWaveGame.h"
 #include "Common/VertexStructuer.h"
-#include <time.h>
+#include <ctime>
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -17,15 +17,18 @@ HillAndWaveGame::~HillAndWaveGame()
 
 void HillAndWaveGame::Initialize(HWND window, int width, int height)
 {
-	m_objects.push_back(new Hill());
-	m_objects.push_back(new Wave());
-
 	m_initCameraY = 150.f;
 	m_initCameraZ = -150.f;
 	m_maxRadius = 300.f;
 	m_mouseMoveRate = 15.f;
 
 	Super::Initialize(window, width, height);
+}
+
+void HillAndWaveGame::AddObjects()
+{
+	m_objects.push_back(new Hill());
+	m_objects.push_back(new Wave());
 }
 
 inline float Hill::GetHeight(float x, float z) const

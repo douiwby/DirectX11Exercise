@@ -6,6 +6,7 @@ using Microsoft::WRL::ComPtr;
 
 void MultiObjectGame::Initialize(HWND window, int width, int height)
 {
+	AddObjects();
 
 	Super::Initialize(window, width, height);
 

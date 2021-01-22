@@ -38,6 +38,9 @@
     <Filter Include="MirrorGame">
       <UniqueIdentifier>{69500f21-1f1f-4b82-b128-6865742d1617}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TreeBillboardGame">
+      <UniqueIdentifier>{e91b3e19-6aa2-4b35-8409-54369450eb33}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -90,6 +93,9 @@
     <ClInclude Include="Common\LightStructuer.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="TreeBillboardGame\TreeBillboardGame.h">
+      <Filter>TreeBillboardGame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -136,6 +142,9 @@
     <ClCompile Include="Common\LitShape.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="TreeBillboardGame\TreeBillboardGame.cpp">
+      <Filter>TreeBillboardGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -174,6 +183,9 @@
     </FxCompile>
     <FxCompile Include="TransparentWaveGame\Blending.hlsl">
       <Filter>TransparentWaveGame</Filter>
+    </FxCompile>
+    <FxCompile Include="TreeBillboardGame\TreeSprite.hlsl">
+      <Filter>TreeBillboardGame</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

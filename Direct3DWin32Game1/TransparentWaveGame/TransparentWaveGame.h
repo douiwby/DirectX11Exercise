@@ -7,13 +7,15 @@ class TransparentWaveGame : public LitHillGame
 
 public:
 
-	virtual void Initialize(HWND window, int width, int height);
+	virtual void Initialize(HWND window, int width, int height) override;
 
 protected:
 
-	virtual void BuildLight();
+	virtual void BuildLight() override;
 
-	virtual void Update(DX::StepTimer const& timer);
+	virtual void Update(DX::StepTimer const& timer) override;
+
+	virtual void AddObjects() override;
 
 	struct cbPerFrame
 	{

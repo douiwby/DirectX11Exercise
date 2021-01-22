@@ -86,3 +86,18 @@ void Shape::CreateVSAndPSShader(const std::wstring & vsFilename, const std::wstr
 	hr = m_d3dDevice->CreatePixelShader(m_PSByteCode->GetBufferPointer(), m_PSByteCode->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
 	DX::ThrowIfFailed(hr);
 }
+
+void Shape::CreateConstantBuffer(UINT bufferSize)
+{
+	// Set constant buffer
+	D3D11_BUFFER_DESC cbDesc;
+	cbDesc.ByteWidth = bufferSize;
+	cbDesc.Usage = D3D11_USAGE_DEFAULT;
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.CPUAccessFlags = 0;
+	cbDesc.MiscFlags = 0;
+	cbDesc.StructureByteStride = 0;
+
+	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+}

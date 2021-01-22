@@ -1,25 +1,23 @@
 #include "pch.h"
 #include "TransparentWaveGame/TransparentWaveGame.h"
 
+#define ENABLEFOG 0
+
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 using VertexType = VertexPositionNormalUV;
 
 void TransparentWaveGame::Initialize(HWND window, int width, int height)
 {
-	m_objects.push_back(new TextureHill());
-	m_objects.push_back(new Crate());
-	m_objects.push_back(new TransparentWave());
 
 	m_initCameraY = 150.f;
 	m_initCameraZ = -150.f;
 	m_maxRadius = 300.f;
 	m_mouseMoveRate = 15.f;
 
-	MultiObjectGame::Initialize(window, width, height);
+	Super::Initialize(window, width, height);
 
-	BuildLight();
-
+	// Set per frame constant buffer
 	D3D11_BUFFER_DESC cbDesc;
 	cbDesc.ByteWidth = sizeof(cbPerFrame);
 	cbDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -57,11 +55,20 @@ void TransparentWaveGame::Update(DX::StepTimer const & timer)
 	m_d3dContext->UpdateSubresource(m_constantBufferPerFrame.Get(), 0, nullptr, &m_cbPerFrame, 0, 0);
 }
 
+void TransparentWaveGame::AddObjects()
+{
+	m_objects.push_back(new TextureHill());
+	m_objects.push_back(new Crate());
+	m_objects.push_back(new TransparentWave());
+}
+
 void TextureHill::BuildShader()
 {
 	const D3D_SHADER_MACRO alphaTestDefines[] =
 	{
+#if ENABLEFOG
 		"FOG", "1",
+#endif
 		"ALPHA_TEST", "1",
 		NULL, NULL
 	};
@@ -74,7 +81,9 @@ void TransparentWave::BuildShader()
 {
 	const D3D_SHADER_MACRO alphaTestDefines[] =
 	{
+#if ENABLEFOG
 		"FOG", "1",
+#endif
 		"ALPHA_TEST", "1",
 		NULL, NULL
 	};
@@ -292,7 +301,9 @@ void Crate::BuildShader()
 {
 	const D3D_SHADER_MACRO alphaTestDefines[] =
 	{
+#if ENABLEFOG
 		"FOG", "1",
+#endif
 		"ALPHA_TEST", "1",
 		NULL, NULL
 	};

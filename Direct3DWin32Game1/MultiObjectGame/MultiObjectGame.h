@@ -21,5 +21,7 @@ protected:
 	virtual void PreObjectsRender() {}
 	virtual void PostObjectsRender() {}
 
+	virtual void AddObjects() = 0;
+
 	std::vector<RenderObject*> m_objects;
 };

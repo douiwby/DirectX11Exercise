@@ -12,12 +12,17 @@
 
 class MultiShapeGame : public MultiObjectGame
 {
-public:
 	using Super = MultiObjectGame;
+
+public:
 
 	virtual ~MultiShapeGame();
 
-	virtual void Initialize(HWND window, int width, int height);
+	virtual void Initialize(HWND window, int width, int height) override;
+
+protected:
+
+	virtual void AddObjects() override;
 };
 
 class Box : public RenderObject

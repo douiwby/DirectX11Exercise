@@ -55,13 +55,14 @@ void LitShape::Update(DX::StepTimer const & timer)
 	XMMATRIX view = XMLoadFloat4x4(m_view);
 	XMMATRIX proj = XMLoadFloat4x4(m_proj);
 
+	XMStoreFloat4x4(&m_cbPerObject.world, XMMatrixTranspose(world));
+
 	XMMATRIX worldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, view), proj);
 	world.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 	XMVECTOR det = XMMatrixDeterminant(world);
 	XMMATRIX worldInvTranspose = XMMatrixTranspose(XMMatrixInverse(&det, world));
 
 	// Use XMMatrixTranspose before send to GPU due to HLSL using column-major
-	XMStoreFloat4x4(&m_cbPerObject.world, XMMatrixTranspose(world));
 	XMStoreFloat4x4(&m_cbPerObject.worldInvTranspose, XMMatrixTranspose(worldInvTranspose));
 	XMStoreFloat4x4(&m_cbPerObject.worldViewProj, XMMatrixTranspose(worldViewProj));
 

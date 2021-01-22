@@ -10,13 +10,22 @@ MirrorGame::~MirrorGame()
 {
 	for (auto it = m_objects.begin(); it != m_objects.end(); ++it)
 	{
-		delete (*it);
-		*it = nullptr;
+		if (*it)
+		{
+			delete (*it);
+			*it = nullptr;
+		}
 	}
-	delete mirror;
-	mirror = nullptr;
-	delete shadow;
-	shadow = nullptr;
+	if (mirror)
+	{
+		delete mirror;
+		mirror = nullptr;
+	}
+	if (shadow)
+	{
+		delete shadow;
+		shadow = nullptr;
+	}
 
 	m_objects.clear();
 	m_reflectObjects.clear();
@@ -24,17 +33,6 @@ MirrorGame::~MirrorGame()
 
 void MirrorGame::Initialize(HWND window, int width, int height)
 {
-	ReflectShape* wall = new Wall();
-	ReflectShape* floor = new Floor();
-	ReflectShape* crate = new LitCrate();
-	m_objects.push_back(wall);
-	m_objects.push_back(floor);
-	m_objects.push_back(crate);
-	m_reflectObjects.push_back(floor);
-	m_reflectObjects.push_back(crate);
-	mirror = new Mirror();
-	shadow = new LitCrateShadow();
-
 	m_initCameraY = 20.f;
 	m_initCameraZ = -20.f;
 	m_maxRadius = 100.f;
@@ -109,7 +107,8 @@ void MirrorGame::Update(DX::StepTimer const & timer)
 void MirrorGame::UpdateLightPosition(DX::StepTimer const & timer)
 {
 	float elapsedTime = float(timer.GetElapsedSeconds());
-
+	
+	// Control the spot light by keyboard.
 	// Key map
 	// https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 
@@ -355,6 +354,20 @@ void MirrorGame::PostObjectsRender()
 	// Clear the state
 	m_d3dContext->OMSetDepthStencilState(nullptr, 0);
 	m_d3dContext->OMSetBlendState(nullptr, blendFactors, UINT_MAX);
+}
+
+void MirrorGame::AddObjects()
+{
+	ReflectShape* wall = new Wall();
+	ReflectShape* floor = new Floor();
+	ReflectShape* crate = new LitCrate();
+	m_objects.push_back(wall);
+	m_objects.push_back(floor);
+	m_objects.push_back(crate);
+	m_reflectObjects.push_back(floor);
+	m_reflectObjects.push_back(crate);
+	mirror = new Mirror();
+	shadow = new LitCrateShadow();
 }
 
 inline void MirrorGame::RotateVectorByZAxis(DirectX::XMFLOAT3& vector, float rotateRadian)

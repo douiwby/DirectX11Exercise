@@ -4,12 +4,17 @@
 
 class HillAndWaveGame : public MultiObjectGame
 {
-public:
 	using Super = MultiObjectGame;
+
+public:
 
 	virtual ~HillAndWaveGame();
 
-	virtual void Initialize(HWND window, int width, int height);
+	virtual void Initialize(HWND window, int width, int height) override;
+
+protected:
+
+	virtual void AddObjects() override;
 };
 
 class Hill : public Shape

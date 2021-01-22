@@ -12,15 +12,21 @@ public:
 
 	virtual ~LitHillGame();
 
-	virtual void Initialize(HWND window, int width, int height);
+	virtual void Initialize(HWND window, int width, int height) override;
 
 protected:
 
+	virtual void Update(DX::StepTimer const& timer) override;
+
+	virtual void AddObjects() override;
+
 	virtual void BuildLight();
 
-	virtual void Update(DX::StepTimer const& timer);
-
 	virtual void UpdateLightPosition(DX::StepTimer const& timer);
+
+	inline void RotateVectorByZAxis(DirectX::XMFLOAT3& vector, float rotateRadian);
+	inline void RotateVectorByXAxis(DirectX::XMFLOAT3& vector, float rotateRadian);
+	inline void RotateVector(DirectX::XMFLOAT3& vector, DirectX::XMFLOAT4X4& rotation);
 
 	struct cbPerFrame
 	{

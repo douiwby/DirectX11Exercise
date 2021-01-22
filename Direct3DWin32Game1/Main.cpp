@@ -12,9 +12,10 @@
 #include "LitHillGame/LitHillGame.h"
 #include "TransparentWaveGame/TransparentWaveGame.h"
 #include "MirrorGame/MirrorGame.h"
+#include "TreeBillboardGame/TreeBillboardGame.h"
 
 using namespace DirectX;
-using TargetGame = MirrorGame;
+using TargetGame = TreeBillboardGame;
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
