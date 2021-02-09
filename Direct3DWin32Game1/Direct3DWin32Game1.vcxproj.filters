@@ -41,6 +41,12 @@
     <Filter Include="TreeBillboardGame">
       <UniqueIdentifier>{e91b3e19-6aa2-4b35-8409-54369450eb33}</UniqueIdentifier>
     </Filter>
+    <Filter Include="VecAddGame">
+      <UniqueIdentifier>{ace854f5-6c63-486a-b473-7f3f445faca2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BlurWaveGame">
+      <UniqueIdentifier>{5fd11504-d551-45e3-ac82-5bc052fbb34b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -96,6 +102,12 @@
     <ClInclude Include="TreeBillboardGame\TreeBillboardGame.h">
       <Filter>TreeBillboardGame</Filter>
     </ClInclude>
+    <ClInclude Include="VecAddGame\VecAddGame.h">
+      <Filter>VecAddGame</Filter>
+    </ClInclude>
+    <ClInclude Include="BlurWaveGame\BlurWaveGame.h">
+      <Filter>BlurWaveGame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -145,6 +157,12 @@
     <ClCompile Include="TreeBillboardGame\TreeBillboardGame.cpp">
       <Filter>TreeBillboardGame</Filter>
     </ClCompile>
+    <ClCompile Include="VecAddGame\VecAddGame.cpp">
+      <Filter>VecAddGame</Filter>
+    </ClCompile>
+    <ClCompile Include="BlurWaveGame\BlurWaveGame.cpp">
+      <Filter>BlurWaveGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -186,6 +204,12 @@
     </FxCompile>
     <FxCompile Include="TreeBillboardGame\TreeSprite.hlsl">
       <Filter>TreeBillboardGame</Filter>
+    </FxCompile>
+    <FxCompile Include="VecAddGame\VecAdd.hlsl">
+      <Filter>VecAddGame</Filter>
+    </FxCompile>
+    <FxCompile Include="BlurWaveGame\Blur.hlsl">
+      <Filter>BlurWaveGame</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

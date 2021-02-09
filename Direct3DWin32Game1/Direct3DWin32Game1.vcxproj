@@ -22,7 +22,7 @@
     <RootNamespace>Direct3DWin32Game1</RootNamespace>
     <ProjectGuid>{691413ed-4d89-42dc-9010-4c37694a02b0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -166,6 +166,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BlurWaveGame\BlurWaveGame.h" />
     <ClInclude Include="BoxGame\BoxGame.h" />
     <ClInclude Include="Common\d3dUtil.h" />
     <ClInclude Include="CrateGame\CrateGame.h" />
@@ -185,8 +186,10 @@
     <ClInclude Include="StepTimer.h" />
     <ClInclude Include="TransparentWaveGame\TransparentWaveGame.h" />
     <ClInclude Include="TreeBillboardGame\TreeBillboardGame.h" />
+    <ClInclude Include="VecAddGame\VecAddGame.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BlurWaveGame\BlurWaveGame.cpp" />
     <ClCompile Include="BoxGame\BoxGame.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="CrateGame\CrateGame.cpp" />
@@ -209,6 +212,7 @@
     </ClCompile>
     <ClCompile Include="TransparentWaveGame\TransparentWaveGame.cpp" />
     <ClCompile Include="TreeBillboardGame\TreeBillboardGame.cpp" />
+    <ClCompile Include="VecAddGame\VecAddGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -222,6 +226,12 @@
     <Manifest Include="settings.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="BlurWaveGame\Blur.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="BoxGame\Base.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -259,6 +269,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="TreeBillboardGame\TreeSprite.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="VecAddGame\VecAdd.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

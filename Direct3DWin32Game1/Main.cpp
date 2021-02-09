@@ -13,9 +13,11 @@
 #include "TransparentWaveGame/TransparentWaveGame.h"
 #include "MirrorGame/MirrorGame.h"
 #include "TreeBillboardGame/TreeBillboardGame.h"
+#include "VecAddGame/VecAddGame.h"
+#include "BlurWaveGame/BlurWaveGame.h"
 
 using namespace DirectX;
-using TargetGame = TreeBillboardGame;
+using TargetGame = BlurWaveGame;
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
