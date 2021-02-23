@@ -47,6 +47,9 @@
     <Filter Include="BlurWaveGame">
       <UniqueIdentifier>{5fd11504-d551-45e3-ac82-5bc052fbb34b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BasicTessellationGame">
+      <UniqueIdentifier>{cb658d9e-f997-49c6-b690-3bd61f59dc21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -108,6 +111,9 @@
     <ClInclude Include="BlurWaveGame\BlurWaveGame.h">
       <Filter>BlurWaveGame</Filter>
     </ClInclude>
+    <ClInclude Include="BasicTessellationGame\BasicTessellationGame.h">
+      <Filter>BasicTessellationGame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -163,6 +169,9 @@
     <ClCompile Include="BlurWaveGame\BlurWaveGame.cpp">
       <Filter>BlurWaveGame</Filter>
     </ClCompile>
+    <ClCompile Include="BasicTessellationGame\BasicTessellationGame.cpp">
+      <Filter>BasicTessellationGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -210,6 +219,9 @@
     </FxCompile>
     <FxCompile Include="BlurWaveGame\Blur.hlsl">
       <Filter>BlurWaveGame</Filter>
+    </FxCompile>
+    <FxCompile Include="BasicTessellationGame\Tessellation.hlsl">
+      <Filter>BasicTessellationGame</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

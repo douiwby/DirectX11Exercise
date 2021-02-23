@@ -9,12 +9,6 @@ using VertexType = VertexPositionNormalUV;
 
 void TransparentWaveGame::Initialize(HWND window, int width, int height)
 {
-
-	m_initCameraY = 150.f;
-	m_initCameraZ = -150.f;
-	m_maxRadius = 300.f;
-	m_mouseMoveRate = 15.f;
-
 	Super::Initialize(window, width, height);
 
 	// Set per frame constant buffer

@@ -15,6 +15,13 @@ void BlurWaveGame::Initialize(HWND window, int width, int height)
 	BuildOffscreenViews();
 }
 
+void BlurWaveGame::OnWindowSizeChanged(int width, int height)
+{
+	Super::OnWindowSizeChanged(width, height);
+
+	BuildOffscreenViews();
+}
+
 void BlurWaveGame::Update(DX::StepTimer const & timer)
 {
 	Super::Update(timer);

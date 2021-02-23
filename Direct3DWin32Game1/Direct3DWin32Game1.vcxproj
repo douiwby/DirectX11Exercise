@@ -166,6 +166,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BasicTessellationGame\BasicTessellationGame.h" />
     <ClInclude Include="BlurWaveGame\BlurWaveGame.h" />
     <ClInclude Include="BoxGame\BoxGame.h" />
     <ClInclude Include="Common\d3dUtil.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="VecAddGame\VecAddGame.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BasicTessellationGame\BasicTessellationGame.cpp" />
     <ClCompile Include="BlurWaveGame\BlurWaveGame.cpp" />
     <ClCompile Include="BoxGame\BoxGame.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
@@ -226,6 +228,12 @@
     <Manifest Include="settings.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="BasicTessellationGame\Tessellation.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="BlurWaveGame\Blur.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

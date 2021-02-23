@@ -9,6 +9,13 @@ class LitHillGame : public MultiObjectGame
 	using Super = MultiObjectGame;
 
 public:
+	LitHillGame() 
+	{
+		m_initCameraY = 150.f;
+		m_initCameraZ = -150.f;
+		m_maxRadius = 300.f;
+		m_mouseMoveRate = 15.f;
+	}
 
 	virtual ~LitHillGame();
 

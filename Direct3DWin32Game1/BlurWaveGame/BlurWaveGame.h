@@ -9,6 +9,8 @@ public:
 
 	virtual void Initialize(HWND window, int width, int height) override;
 
+	virtual void OnWindowSizeChanged(int width, int height) override;
+
 protected:
 
 	virtual void Update(DX::StepTimer const& timer) override;
