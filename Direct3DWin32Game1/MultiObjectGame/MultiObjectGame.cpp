@@ -49,6 +49,8 @@ void MultiObjectGame::Tick()
 			Present();
 		}
 	});
+
+	CalculateFrameStats();
 }
 
 void MultiObjectGame::Update(DX::StepTimer const & timer)

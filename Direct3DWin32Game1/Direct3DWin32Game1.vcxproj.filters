@@ -50,6 +50,9 @@
     <Filter Include="BasicTessellationGame">
       <UniqueIdentifier>{cb658d9e-f997-49c6-b690-3bd61f59dc21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="InstancingGame">
+      <UniqueIdentifier>{10008044-9459-4a3b-be76-29d51c834efb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -114,6 +117,9 @@
     <ClInclude Include="BasicTessellationGame\BasicTessellationGame.h">
       <Filter>BasicTessellationGame</Filter>
     </ClInclude>
+    <ClInclude Include="InstancingGame\InstancingGame.h">
+      <Filter>InstancingGame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -172,6 +178,9 @@
     <ClCompile Include="BasicTessellationGame\BasicTessellationGame.cpp">
       <Filter>BasicTessellationGame</Filter>
     </ClCompile>
+    <ClCompile Include="InstancingGame\InstancingGame.cpp">
+      <Filter>InstancingGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -222,6 +231,9 @@
     </FxCompile>
     <FxCompile Include="BasicTessellationGame\Tessellation.hlsl">
       <Filter>BasicTessellationGame</Filter>
+    </FxCompile>
+    <FxCompile Include="InstancingGame\InstancingObjectWithUV.hlsl">
+      <Filter>InstancingGame</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

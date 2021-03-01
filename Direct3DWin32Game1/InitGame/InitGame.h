@@ -33,6 +33,8 @@ public:
 	virtual void ToggleWireframe();
 	virtual void ToggleAutoRotate();
 
+	virtual void OnKeyButtonPressed(WPARAM key);
+
 protected:
 
 	virtual void Update(DX::StepTimer const& timer);
@@ -45,6 +47,8 @@ protected:
 	virtual void Present();
 
 	virtual void OnDeviceLost();
+
+	virtual void CalculateFrameStats();
 
 	// Rendering loop timer.
 	DX::StepTimer                                   m_timer;

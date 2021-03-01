@@ -175,6 +175,7 @@
     <ClInclude Include="HillGame\HillGame.h" />
     <ClInclude Include="InitGame\InitGame.h" />
     <ClInclude Include="Common\LightStructuer.h" />
+    <ClInclude Include="InstancingGame\InstancingGame.h" />
     <ClInclude Include="LitHillGame\LitHillGame.h" />
     <ClInclude Include="Common\LitShape.h" />
     <ClInclude Include="MirrorGame\MirrorGame.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="HillAndWaveGame\HillAndWaveGame.cpp" />
     <ClCompile Include="HillGame\HillGame.cpp" />
     <ClCompile Include="InitGame\InitGame.cpp" />
+    <ClCompile Include="InstancingGame\InstancingGame.cpp" />
     <ClCompile Include="LitHillGame\LitHillGame.cpp" />
     <ClCompile Include="Common\LitShape.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -253,6 +255,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="HillGame\Hill.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="InstancingGame\InstancingObjectWithUV.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

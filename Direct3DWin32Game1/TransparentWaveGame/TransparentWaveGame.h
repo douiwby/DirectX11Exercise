@@ -7,11 +7,11 @@ class TransparentWaveGame : public LitHillGame
 
 public:
 
-	virtual void Initialize(HWND window, int width, int height) override;
-
 protected:
 
 	virtual void BuildLight() override;
+
+	virtual void BuildConstantBuffer() override;
 
 	virtual void Update(DX::StepTimer const& timer) override;
 

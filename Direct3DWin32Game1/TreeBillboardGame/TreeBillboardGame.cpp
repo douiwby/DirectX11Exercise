@@ -119,6 +119,8 @@ void TreeBillboard::BuildMaterial()
 
 void TreeBillboard::BuildTexture()
 {
+#define USING_ARRAY_TEXTURE 0
+#if USING_ARRAY_TEXTURE
 	ComPtr<ID3D11Texture2D> srcTextures;
 	ComPtr<ID3D11Resource> textureResources;
 
@@ -132,6 +134,77 @@ void TreeBillboard::BuildTexture()
 	D3D11_TEXTURE2D_DESC texElementDesc;
 	srcTextures->GetDesc(&texElementDesc);
 	UINT arraySize = texElementDesc.ArraySize;  // Can send to shader
+#else
+	std::vector<std::wstring> treeFilenames;
+	//treeFilenames.push_back(L"TreeBillboardGame/tree0.dds"); // This texture's format is different with other 3
+	treeFilenames.push_back(L"TreeBillboardGame/tree1.dds");
+	treeFilenames.push_back(L"TreeBillboardGame/tree2.dds");
+	treeFilenames.push_back(L"TreeBillboardGame/tree3.dds");
+
+	int texArraySize = 3;
+
+	std::vector<ComPtr<ID3D11Texture2D>> srcTextures(texArraySize);
+	std::vector<ComPtr<ID3D11Resource>> textureResources(texArraySize);
+
+	for (int i = 0; i < texArraySize; ++i)
+	{
+		HRESULT hr = CreateDDSTextureFromFileEx(m_d3dDevice.Get(), treeFilenames[i].c_str(),
+			0, D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0, false,
+			textureResources[i].GetAddressOf(), nullptr);
+		DX::ThrowIfFailed(hr);
+
+		hr = textureResources[i].As(&srcTextures[i]);
+		DX::ThrowIfFailed(hr);
+
+		D3D11_TEXTURE2D_DESC texElementDesc;
+		srcTextures[i]->GetDesc(&texElementDesc);
+
+		DXGI_FORMAT format = texElementDesc.Format;
+	}
+
+	D3D11_TEXTURE2D_DESC texArrayDesc;
+	srcTextures[0]->GetDesc(&texArrayDesc);
+	texArrayDesc.ArraySize = texArraySize;
+	texArrayDesc.Usage = D3D11_USAGE_DEFAULT;
+	texArrayDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	texArrayDesc.CPUAccessFlags = 0;
+
+	ComPtr<ID3D11Texture2D> texArray;
+	HRESULT hr = m_d3dDevice->CreateTexture2D(&texArrayDesc, nullptr, texArray.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+
+	for (int i = 0; i < texArraySize; ++i)
+	{
+		for (int mipLevel = 0; mipLevel < texArrayDesc.MipLevels; ++mipLevel)
+		{
+			D3D11_MAPPED_SUBRESOURCE mappedTex2D;
+			hr = m_d3dContext->Map(srcTextures[i].Get(), mipLevel, D3D11_MAP_READ, 0, &mappedTex2D);
+			DX::ThrowIfFailed(hr);
+
+			m_d3dContext->UpdateSubresource(
+				texArray.Get(),
+				D3D11CalcSubresource(mipLevel, i, texArrayDesc.MipLevels),
+				0,
+				mappedTex2D.pData,
+				mappedTex2D.RowPitch,
+				mappedTex2D.DepthPitch
+			);
+
+			m_d3dContext->Unmap(srcTextures[i].Get(), mipLevel);
+		}
+	}
+	
+	D3D11_SHADER_RESOURCE_VIEW_DESC texArraySRVDesc;
+	texArraySRVDesc.Format = texArrayDesc.Format;
+	texArraySRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+	texArraySRVDesc.Texture2DArray.MostDetailedMip = 0;
+	texArraySRVDesc.Texture2DArray.MipLevels = texArrayDesc.MipLevels;
+	texArraySRVDesc.Texture2DArray.FirstArraySlice = 0;
+	texArraySRVDesc.Texture2DArray.ArraySize = texArraySize;
+
+	hr = m_d3dDevice->CreateShaderResourceView(texArray.Get(), &texArraySRVDesc, m_diffuseMapView.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+#endif
 }
 
 void TreeBillboard::Update(DX::StepTimer const & timer)

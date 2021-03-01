@@ -13,13 +13,15 @@ class CrateGame : public BoxGame
 public:
 	using Super = BoxGame;
 
-	virtual void Initialize(HWND window, int width, int height);
+	virtual void Initialize(HWND window, int width, int height) override;
+
+	virtual void OnKeyButtonPressed(WPARAM key) override;
 
 	virtual void ToggleSampler();
 
 protected:
 
-	virtual void SetInputLayout();
+	virtual void SetInputLayout() override;
 	void BuildCrate();
 	void BuildTexture();
 

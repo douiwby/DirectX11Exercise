@@ -29,6 +29,8 @@ protected:
 
 	virtual void BuildLight();
 
+	virtual void BuildConstantBuffer();
+
 	virtual void UpdateLightPosition(DX::StepTimer const& timer);
 
 	inline void RotateVectorByZAxis(DirectX::XMFLOAT3& vector, float rotateRadian);

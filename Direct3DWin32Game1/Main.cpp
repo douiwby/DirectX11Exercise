@@ -16,9 +16,10 @@
 #include "VecAddGame/VecAddGame.h"
 #include "BlurWaveGame/BlurWaveGame.h"
 #include "BasicTessellationGame/BasicTessellationGame.h"
+#include "InstancingGame/InstancingGame.h"
 
 using namespace DirectX;
-using TargetGame = BasicTessellationGame;
+using TargetGame = InstancingGame;
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
@@ -286,26 +287,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		// Key map
 		// https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-		if (wParam == 0x46) // F key
-		{
-			game->ToggleWireframe();
-		}
-		if (wParam == 0x47) // G key
-		{
-			game->ToggleAutoRotate();
-		}
-		if (wParam == 0x54) // T key
-		{
-			CrateGame* crateGame = dynamic_cast<CrateGame*>(game);
-			if (crateGame)
-			{
-				crateGame->ToggleSampler();
-				break;
-			}
-		}
-		else if (wParam == VK_ESCAPE)
+		if (wParam == VK_ESCAPE)
 		{
 			PostQuitMessage(0);
+		}
+		else
+		{
+			game->OnKeyButtonPressed(wParam);
 		}
 		break;
     }

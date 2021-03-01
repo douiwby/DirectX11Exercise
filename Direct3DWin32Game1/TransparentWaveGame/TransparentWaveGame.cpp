@@ -7,10 +7,17 @@ using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 using VertexType = VertexPositionNormalUV;
 
-void TransparentWaveGame::Initialize(HWND window, int width, int height)
+void TransparentWaveGame::BuildLight()
 {
-	Super::Initialize(window, width, height);
+	Super::BuildLight();
 
+	m_dirLight.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pointLight.Diffuse = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_spotLight.Diffuse = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+}
+
+void TransparentWaveGame::BuildConstantBuffer()
+{
 	// Set per frame constant buffer
 	D3D11_BUFFER_DESC cbDesc;
 	cbDesc.ByteWidth = sizeof(cbPerFrame);
@@ -22,17 +29,6 @@ void TransparentWaveGame::Initialize(HWND window, int width, int height)
 
 	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerFrame.GetAddressOf());
 	DX::ThrowIfFailed(hr);
-
-	m_d3dContext->PSSetConstantBuffers(0, 1, m_constantBufferPerFrame.GetAddressOf());
-}
-
-void TransparentWaveGame::BuildLight()
-{
-	Super::BuildLight();
-
-	m_dirLight.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_pointLight.Diffuse = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	m_spotLight.Diffuse = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 }
 
 void TransparentWaveGame::Update(DX::StepTimer const & timer)
@@ -265,22 +261,6 @@ void Crate::BuildShape()
 	ibInitData.SysMemSlicePitch = 0;
 
 	hr = m_d3dDevice->CreateBuffer(&ibDesc, &ibInitData, m_indexBuffer.GetAddressOf());
-	DX::ThrowIfFailed(hr);
-
-	m_d3dContext->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-	m_d3dContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// Set constant buffer
-	D3D11_BUFFER_DESC cbDesc;
-	cbDesc.ByteWidth = sizeof(cbPerObjectStruct);
-	cbDesc.Usage = D3D11_USAGE_DEFAULT;
-	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbDesc.CPUAccessFlags = 0;
-	cbDesc.MiscFlags = 0;
-	cbDesc.StructureByteStride = 0;
-
-	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
 	DX::ThrowIfFailed(hr);
 }
 

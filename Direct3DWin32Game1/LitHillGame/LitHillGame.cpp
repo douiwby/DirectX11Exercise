@@ -28,6 +28,9 @@ void LitHillGame::Initialize(HWND window, int width, int height)
 	Super::Initialize(window, width, height);
 
 	BuildLight();
+	BuildConstantBuffer();
+
+	m_d3dContext->PSSetConstantBuffers(0, 1, m_constantBufferPerFrame.GetAddressOf());
 }
 
 void LitHillGame::BuildLight()
@@ -58,7 +61,10 @@ void LitHillGame::BuildLight()
 	m_cbPerFrame.dirLight = m_dirLight;
 	m_cbPerFrame.pointLight = m_pointLight;
 	m_cbPerFrame.spotLight = m_spotLight;
+}
 
+void LitHillGame::BuildConstantBuffer()
+{
 	D3D11_BUFFER_DESC cbDesc;
 	cbDesc.ByteWidth = sizeof(cbPerFrame);
 	cbDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -69,8 +75,6 @@ void LitHillGame::BuildLight()
 
 	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerFrame.GetAddressOf());
 	DX::ThrowIfFailed(hr);
-
-	m_d3dContext->PSSetConstantBuffers(0, 1, m_constantBufferPerFrame.GetAddressOf());
 }
 
 void LitHillGame::Update(DX::StepTimer const & timer)

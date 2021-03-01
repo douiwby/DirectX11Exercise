@@ -40,6 +40,16 @@ void CrateGame::Initialize(HWND window, int width, int height)
 	XMStoreFloat4x4(&m_proj, perspectiveMatrix);
 }
 
+void CrateGame::OnKeyButtonPressed(WPARAM key)
+{
+	Super::OnKeyButtonPressed(key);
+
+	if (key == 'T')
+	{
+		ToggleSampler();
+	}
+}
+
 void CrateGame::SetInputLayout()
 {
 	ComPtr<ID3DBlob> mvsByteCode = d3dUtil::CompileShader(L"CrateGame\\Crate.hlsl", nullptr, "VS", "vs_5_0");

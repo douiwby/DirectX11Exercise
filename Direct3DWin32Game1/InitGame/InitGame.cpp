@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "InitGame.h"
+#include <sstream>
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -49,6 +50,8 @@ void InitGame::Tick()
 	});
 
 	Render();
+
+	CalculateFrameStats();
 }
 
 // Message handlers
@@ -345,6 +348,37 @@ void InitGame::OnDeviceLost()
 	CreateResources();
 }
 
+void InitGame::CalculateFrameStats()
+{
+	// Code computes the average frames per second, and also the 
+	// average time it takes to render one frame.  These stats 
+	// are appended to the window caption bar.
+
+	static int frameCnt = 0;
+	static float timeElapsed = 0.0f;
+
+	frameCnt++;
+
+	// Compute averages over one second period.
+	if ((m_timer.GetTotalSeconds() - timeElapsed) >= 1.0f)
+	{
+		float fps = (float)frameCnt; // fps = frameCnt / 1
+		float mspf = 1000.0f / fps;
+
+		std::wostringstream outs;
+		outs.precision(6);
+
+		outs << "DirectX3DWin32Game" << L"    "
+			<< L"FPS: " << fps << L"    "
+			<< L"Frame Time: " << mspf << L" (ms)";
+		SetWindowText(m_window, outs.str().c_str());
+
+		// Reset for next average.
+		frameCnt = 0;
+		timeElapsed += 1.0f;
+	}
+}
+
 void InitGame::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	m_lastMousePos.x = x;
@@ -413,4 +447,17 @@ void InitGame::ToggleWireframe()
 void InitGame::ToggleAutoRotate()
 {
 	bAutoRotate = !bAutoRotate;
+}
+
+void InitGame::OnKeyButtonPressed(WPARAM key)
+{
+	if (key == 'F')
+	{
+		ToggleWireframe();
+	}
+
+	if (key == 'G')
+	{
+		ToggleAutoRotate();
+	}
 }
