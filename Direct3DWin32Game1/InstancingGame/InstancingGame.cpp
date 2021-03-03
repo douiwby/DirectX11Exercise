@@ -6,7 +6,6 @@
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
-using VertexType = VertexPositionNormalUV;
 
 struct MaterialData
 {
@@ -22,9 +21,6 @@ void InstancingGame::Initialize(HWND window, int width, int height)
 	Super::Initialize(window, width, height);
 
 	BuildInstancedBuffer();
-
-	m_d3dContext->VSSetShaderResources(1, 1, m_instanceDataSRV.GetAddressOf());
-	m_d3dContext->VSSetConstantBuffers(0, 1, m_constantBufferPerFrame.GetAddressOf());
 }
 
 void InstancingGame::OnKeyButtonPressed(WPARAM key)
@@ -40,6 +36,16 @@ void InstancingGame::OnKeyButtonPressed(WPARAM key)
 void InstancingGame::ToggleFrustumCulling()
 {
 	bFrustumCullingEnable = !bFrustumCullingEnable;
+}
+
+void InstancingGame::OnMouseDown(WPARAM btnState, int x, int y)
+{
+	Super::OnMouseDown(btnState, x, y);
+
+	if ((btnState & MK_RBUTTON) != 0)
+	{
+		Pick(x, y);
+	}
 }
 
 void InstancingGame::Update(DX::StepTimer const & timer)
@@ -64,13 +70,17 @@ void InstancingGame::Update(DX::StepTimer const & timer)
 
 void InstancingGame::AddObjects()
 {
-	m_objects.push_back(new InstancingCrate());
-	m_instanceCrate = static_cast<InstancingCrate*>(m_objects[0]);
+	m_instanceCrate = new InstancingCrate();
+	m_objects.push_back(m_instanceCrate);
+
+	m_pickedTriangle = new PickedTriangle();
+	m_objects.push_back(m_pickedTriangle);
 }
 
 void InstancingGame::PostObjectsRender()
 {
 	// Frustum Culling
+
 	if (bFrustumCullingEnable)
 	{
 		m_cullingDataArray.clear();
@@ -88,8 +98,9 @@ void InstancingGame::PostObjectsRender()
 
 			XMMATRIX world = XMMatrixTranspose(XMLoadFloat4x4(&m_instancedDataArray[i].World));
 			XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(world), world);
+			XMMATRIX viewToLocal = XMMatrixMultiply(invView, invWorld);
 
-			frustum.Transform(localFrustum, XMMatrixMultiply(invView, invWorld));
+			frustum.Transform(localFrustum, viewToLocal);
 
 			if (localFrustum.Contains(*(m_instanceCrate->m_bounds)) != ContainmentType::DISJOINT)
 			{
@@ -99,6 +110,9 @@ void InstancingGame::PostObjectsRender()
 
 		m_d3dContext->UpdateSubresource(m_instanceDataBuffer.Get(), 0, nullptr, m_cullingDataArray.data(), 0, 0);
 
+		m_d3dContext->VSSetShaderResources(1, 1, m_instanceDataSRV.GetAddressOf());
+		m_d3dContext->VSSetConstantBuffers(0, 1, m_constantBufferPerFrame.GetAddressOf());
+
 		m_d3dContext->DrawIndexedInstanced(m_instanceCrate->m_indexCount, m_cullingDataArray.size(), 0, 0, 0);
 	}
 	else
@@ -106,6 +120,70 @@ void InstancingGame::PostObjectsRender()
 		m_d3dContext->UpdateSubresource(m_instanceDataBuffer.Get(), 0, nullptr, m_instancedDataArray.data(), 0, 0);
 
 		m_d3dContext->DrawIndexedInstanced(m_instanceCrate->m_indexCount,m_instanceCount, 0, 0, 0);
+	}
+
+	// Render picked triangle
+
+	if (bNewPicked && bPickSuccess)
+	{
+		UINT i0 = m_instanceCrate->m_indices[m_pickedTriangleIndex];
+		UINT i1 = m_instanceCrate->m_indices[m_pickedTriangleIndex + 1];
+		UINT i2 = m_instanceCrate->m_indices[m_pickedTriangleIndex + 2];
+
+		XMVECTOR v0Vec = XMLoadFloat3(&m_instanceCrate->m_vertices[i0].position);
+		XMVECTOR v1Vec = XMLoadFloat3(&m_instanceCrate->m_vertices[i1].position);
+		XMVECTOR v2Vec = XMLoadFloat3(&m_instanceCrate->m_vertices[i2].position);
+
+		XMFLOAT3 n0 = m_instanceCrate->m_vertices[i0].normal;
+		XMFLOAT3 n1 = m_instanceCrate->m_vertices[i1].normal;
+		XMFLOAT3 n2 = m_instanceCrate->m_vertices[i2].normal;
+
+		// Move triangle a lit bit higher than before to avoid z fighting
+		XMVECTOR triangleNormal = XMLoadFloat3(&n0); // Since all normal of three vectors is the same, we just take one as the plane normal.
+		XMVECTOR offset = triangleNormal * 0.01;
+		XMMATRIX translation = XMMatrixTranslationFromVector(offset);
+
+		v0Vec = XMVector3TransformCoord(v0Vec, translation);
+		v1Vec = XMVector3TransformCoord(v1Vec, translation);
+		v2Vec = XMVector3TransformCoord(v2Vec, translation);
+
+		XMFLOAT3 v0, v1, v2;
+		XMStoreFloat3(&v0, v0Vec);
+		XMStoreFloat3(&v1, v1Vec);
+		XMStoreFloat3(&v2, v2Vec);
+
+		VertexPositionNormalColor vertices[3] =
+		{
+			{ v0, n0, XMFLOAT4(Colors::Yellow) },
+			{ v1, n1, XMFLOAT4(Colors::Yellow) },
+			{ v2, n2, XMFLOAT4(Colors::Yellow) }
+		};
+
+		m_d3dContext->UpdateSubresource(m_pickedTriangle->m_vertexBuffer.Get(), 0, nullptr, vertices, 0, 0);
+
+		bNewPicked = false;
+	}
+
+	if (bPickSuccess)
+	{
+		XMMATRIX world = XMMatrixTranspose(XMLoadFloat4x4(&m_instancedDataArray[m_pickedInstaceIndex].World));
+		XMMATRIX view = XMLoadFloat4x4(&m_view);
+		XMMATRIX proj = XMLoadFloat4x4(&m_proj);
+
+		XMMATRIX worldViewProjTranspose = XMMatrixTranspose(XMMatrixMultiply(XMMatrixMultiply(world, view), proj));
+
+		m_d3dContext->UpdateSubresource(m_pickedTriangle->m_constantBufferPerObject.Get(), 0, nullptr, &worldViewProjTranspose, 0, 0);
+
+		m_d3dContext->IASetInputLayout(m_pickedTriangle->m_inputLayout.Get());
+		UINT stride = sizeof(VertexPositionNormalColor);
+		UINT offset = 0;
+		m_d3dContext->IASetVertexBuffers(0, 1, m_pickedTriangle->m_vertexBuffer.GetAddressOf(), &stride, &offset);
+		m_d3dContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_d3dContext->VSSetConstantBuffers(0, 1, m_pickedTriangle->m_constantBufferPerObject.GetAddressOf());
+		m_d3dContext->VSSetShader(m_pickedTriangle->m_vertexShader.Get(), nullptr, 0);
+		m_d3dContext->PSSetShader(m_pickedTriangle->m_pixelShader.Get(), nullptr, 0);
+
+		m_d3dContext->Draw(3, 0);
 	}
 }
 
@@ -223,6 +301,63 @@ void InstancingGame::BuildInstancedBuffer()
 
 	hr = m_d3dDevice->CreateShaderResourceView(m_instanceDataBuffer.Get(), &srvDesc, m_instanceDataSRV.GetAddressOf());
 	DX::ThrowIfFailed(hr);
+}
+
+void InstancingGame::Pick(int x, int y)
+{
+	bNewPicked = true;
+
+	XMFLOAT4X4 proj = m_proj;
+
+	float vx = (+2.0f*x / m_outputWidth - 1.0f) / proj(0, 0);
+	float vy = (-2.0f*y / m_outputHeight + 1.0f) / proj(1, 1);
+
+	XMVECTOR origin = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	XMVECTOR dir = XMVectorSet(vx, vy, 1.f, 0.f);
+
+	XMMATRIX view = XMLoadFloat4x4(&m_view);
+	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
+
+	float tmin = FLT_MAX;
+	bPickSuccess = false;
+	for (int i = 0; i < m_instancedDataArray.size(); ++i)
+	{
+		XMMATRIX world = XMMatrixTranspose(XMLoadFloat4x4(&m_instancedDataArray[i].World));
+		XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(world), world);
+
+		XMMATRIX viewToLocal = XMMatrixMultiply(invView, invWorld);
+
+		XMVECTOR localOrigin = XMVector3TransformCoord(origin, viewToLocal);
+		XMVECTOR localDir = XMVector3TransformNormal(dir, viewToLocal);
+		localDir = XMVector3Normalize(localDir);
+
+		float tb = 0.f;
+		if (m_instanceCrate->m_bounds->Intersects(localOrigin, localDir, tb))
+		{
+			for (int j = 0; j < m_instanceCrate->m_indices.size(); j += 3)
+			{
+				UINT i0 = m_instanceCrate->m_indices[j];
+				UINT i1 = m_instanceCrate->m_indices[j+1];
+				UINT i2 = m_instanceCrate->m_indices[j+2];
+
+				XMVECTOR v0 = XMLoadFloat3(&m_instanceCrate->m_vertices[i0].position);
+				XMVECTOR v1 = XMLoadFloat3(&m_instanceCrate->m_vertices[i1].position);
+				XMVECTOR v2 = XMLoadFloat3(&m_instanceCrate->m_vertices[i2].position);
+
+				float t = FLT_MAX;
+				if (TriangleTests::Intersects(localOrigin, localDir, v0, v1, v2, t))
+				{
+					if (t < tmin)
+					{
+						bPickSuccess = true;
+						tmin = t;
+						m_pickedInstaceIndex = i;
+						m_pickedTriangleIndex = j;
+					}
+				}
+			}
+		}
+	}
 }
 
 InstancingCrate::InstancingCrate()
@@ -353,7 +488,7 @@ void InstancingCrate::BuildShader()
 void InstancingCrate::BuildShape()
 {
 	// Set vertex buffer
-	VertexType vertices[] =
+	VertexType vertices[4*6] =
 	{
 		// Front face
 		{ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.f,0.f) },
@@ -404,6 +539,8 @@ void InstancingCrate::BuildShape()
 
 		vertices[i].position.y += positionOffset;
 
+		m_vertices.push_back(vertices[i]);
+
 		XMVECTOR pos = XMLoadFloat3(&vertices[i].position);
 		vMin = XMVectorMin(pos, vMin);
 		vMax = XMVectorMax(pos, vMax);
@@ -433,7 +570,7 @@ void InstancingCrate::BuildShape()
 	m_d3dContext->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
 
 	// Set index buffer
-	UINT indices[] =
+	UINT indices[6*6] =
 	{
 		// front face
 		0, 1, 2,
@@ -461,6 +598,11 @@ void InstancingCrate::BuildShape()
 	};
 
 	m_indexCount = ARRAYSIZE(indices);
+
+	for (int i = 0; i < m_indexCount; ++i)
+	{
+		m_indices.push_back(indices[i]);
+	}
 
 	D3D11_BUFFER_DESC ibDesc;
 	ibDesc.ByteWidth = sizeof(indices);
@@ -519,4 +661,27 @@ void InstancingCrate::BuildMaterial()
 void InstancingCrate::BuildConstantBuffer()
 {
 	// We removed per object constant buffer, so do nothing here.
+}
+
+void PickedTriangle::Render()
+{
+}
+
+void PickedTriangle::BuildShape()
+{
+	D3D11_BUFFER_DESC vbDesc;
+	vbDesc.ByteWidth = sizeof(VertexPositionNormalColor) * 3;
+	vbDesc.Usage = D3D11_USAGE_DEFAULT;
+	vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbDesc.CPUAccessFlags = 0;
+	vbDesc.MiscFlags = 0;
+	vbDesc.StructureByteStride = 0;
+
+	HRESULT hr = m_d3dDevice->CreateBuffer(&vbDesc, nullptr, m_vertexBuffer.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+}
+
+void PickedTriangle::BuildConstantBuffer()
+{
+	CreateConstantBuffer(sizeof(XMFLOAT4X4));
 }

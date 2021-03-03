@@ -3,8 +3,9 @@
 
 class Shape : public RenderObject
 {
-public:
 	using Super = RenderObject;
+
+public:
 
 	virtual void Initialize(
 		Microsoft::WRL::ComPtr<ID3D11Device>& device,

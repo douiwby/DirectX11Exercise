@@ -7,6 +7,8 @@ namespace DirectX
 	class BoundingBox;
 }
 
+using VertexType = VertexPositionNormalUV;
+
 struct InstanceData
 {
 	DirectX::XMFLOAT4X4 World;
@@ -33,6 +35,8 @@ public:
 
 	void ToggleFrustumCulling();
 
+	virtual void OnMouseDown(WPARAM btnState, int x, int y) override;
+
 protected:
 
 	virtual void Update(DX::StepTimer const& timer) override;
@@ -46,6 +50,8 @@ protected:
 	virtual void CalculateFrameStats() override;
 
 	void BuildInstancedBuffer();
+
+	void Pick(int x, int y);
 
 	struct cbPerFrame
 	{
@@ -69,6 +75,12 @@ protected:
 	class InstancingCrate* m_instanceCrate;
 	int m_instanceCount = 0;
 	bool bFrustumCullingEnable = true;
+
+	class PickedTriangle* m_pickedTriangle;
+	UINT m_pickedInstaceIndex = UINT_MAX;
+	UINT m_pickedTriangleIndex = UINT_MAX;
+	bool bPickSuccess = false;
+	bool bNewPicked = false;
 };
 
 class InstancingCrate : public LitShape
@@ -99,9 +111,26 @@ protected:
 	virtual void BuildMaterial() override;
 	virtual void BuildConstantBuffer() override;
 
-
 	int m_texArraySize = 0;
 	int m_matCount = 4;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_matDataSRV;	
 	DirectX::BoundingBox * m_bounds;
+	std::vector<VertexType> m_vertices;
+	std::vector<UINT> m_indices;
+};
+
+class PickedTriangle : Shape
+{
+	using Super = Shape;
+
+	friend class InstancingGame;
+
+public:
+
+	virtual void Render() override;
+
+protected:
+
+	virtual void BuildShape() override;
+	virtual void BuildConstantBuffer() override;
 };
