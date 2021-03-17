@@ -22,3 +22,8 @@ void RenderObject::Initialize(
 	m_world = new XMFLOAT4X4();
 	XMStoreFloat4x4(m_world, XMMatrixIdentity());
 }
+
+void RenderObject::WorldTransform(XMMATRIX& trans)
+{
+	XMStoreFloat4x4(m_world, XMMatrixMultiply(XMLoadFloat4x4(m_world), trans));
+}

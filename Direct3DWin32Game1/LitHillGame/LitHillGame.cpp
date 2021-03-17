@@ -65,16 +65,7 @@ void LitHillGame::BuildLight()
 
 void LitHillGame::BuildConstantBuffer()
 {
-	D3D11_BUFFER_DESC cbDesc;
-	cbDesc.ByteWidth = sizeof(cbPerFrame);
-	cbDesc.Usage = D3D11_USAGE_DEFAULT;
-	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbDesc.CPUAccessFlags = 0;
-	cbDesc.MiscFlags = 0;
-	cbDesc.StructureByteStride = 0;
-
-	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerFrame.GetAddressOf());
-	DX::ThrowIfFailed(hr);
+	CreateConstantBufferPerFrame(sizeof(cbPerFrame));
 }
 
 void LitHillGame::Update(DX::StepTimer const & timer)
@@ -82,12 +73,7 @@ void LitHillGame::Update(DX::StepTimer const & timer)
 	Super::Update(timer);
 
 	UpdateLightPosition(timer);
-
-	m_cbPerFrame.dirLight = m_dirLight;
-	m_cbPerFrame.pointLight = m_pointLight;
-	m_cbPerFrame.spotLight = m_spotLight;
-	m_cbPerFrame.eyePosW = m_eyePos;
-	m_d3dContext->UpdateSubresource(m_constantBufferPerFrame.Get(), 0, nullptr, &m_cbPerFrame, 0, 0);
+	UpdateConstantBufferPerFrame();
 }
 
 void LitHillGame::AddObjects()
@@ -180,6 +166,30 @@ inline void LitHillGame::RotateVector(DirectX::XMFLOAT3& vector, DirectX::XMFLOA
 	XMVECTOR dir = XMLoadFloat3(&vector);
 	dir = XMVector3Transform(dir, XMLoadFloat4x4(&rotation));
 	XMStoreFloat3(&vector, dir);
+}
+
+void LitHillGame::CreateConstantBufferPerFrame(UINT bufferSize)
+{
+	D3D11_BUFFER_DESC cbDesc;
+	cbDesc.ByteWidth = bufferSize;
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbDesc.MiscFlags = 0;
+	cbDesc.StructureByteStride = 0;
+
+	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerFrame.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+}
+
+void LitHillGame::UpdateConstantBufferPerFrame()
+{
+	m_cbPerFrame.dirLight = m_dirLight;
+	m_cbPerFrame.pointLight = m_pointLight;
+	m_cbPerFrame.spotLight = m_spotLight;
+	m_cbPerFrame.eyePosW = m_eyePos;
+
+	d3dUtil::UpdateDynamicBufferFromData(m_d3dContext, m_constantBufferPerFrame, m_cbPerFrame);
 }
 
 void LitHill::BuildShape()
@@ -671,12 +681,12 @@ void LitWave::UpdateWave(float dt)
 
 void LitHill::BuildTexture()
 {
-	BuildTextureByName(L"TransparentWaveGame\\grass.dds");
+	BuildTextureByName(L"TransparentWaveGame\\grass.dds", m_diffuseMapView);
 }
 
 void LitWave::BuildTexture()
 {
-	BuildTextureByName(L"TransparentWaveGame\\water1.dds");
+	BuildTextureByName(L"TransparentWaveGame\\water1.dds", m_diffuseMapView);
 }
 
 #endif

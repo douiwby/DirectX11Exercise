@@ -37,6 +37,9 @@ protected:
 	inline void RotateVectorByXAxis(DirectX::XMFLOAT3& vector, float rotateRadian);
 	inline void RotateVector(DirectX::XMFLOAT3& vector, DirectX::XMFLOAT4X4& rotation);
 
+	void CreateConstantBufferPerFrame(UINT bufferSize);
+	virtual void UpdateConstantBufferPerFrame();
+
 	struct cbPerFrame
 	{
 		DirectionalLight dirLight;

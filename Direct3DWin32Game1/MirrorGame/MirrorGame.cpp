@@ -484,7 +484,7 @@ void Wall::BuildShader()
 
 void Wall::BuildTexture()
 {
-	BuildTextureByName(L"MirrorGame\\brick01.dds");
+	BuildTextureByName(L"MirrorGame\\brick01.dds", m_diffuseMapView);
 }
 
 void Floor::BuildShape()
@@ -542,7 +542,7 @@ void Floor::BuildShape()
 
 void Floor::BuildTexture()
 {
-	BuildTextureByName(L"MirrorGame\\checkboard.dds");
+	BuildTextureByName(L"MirrorGame\\checkboard.dds", m_diffuseMapView);
 }
 
 void LitCrate::BuildShape()
@@ -669,7 +669,7 @@ void LitCrate::BuildShader()
 
 void LitCrate::BuildTexture()
 {
-	BuildTextureByName(L"CrateGame\\WoodCrate01.dds");
+	BuildTextureByName(L"CrateGame\\WoodCrate01.dds", m_diffuseMapView);
 }
 
 void Mirror::BuildShape()
@@ -683,7 +683,7 @@ void Mirror::BuildShape()
 
 void Mirror::BuildTexture()
 {
-	BuildTextureByName(L"MirrorGame\\ice.dds");
+	BuildTextureByName(L"MirrorGame\\ice.dds", m_diffuseMapView);
 }
 
 void Mirror::BuildMaterial()

@@ -51,21 +51,6 @@ void InstancingGame::OnMouseDown(WPARAM btnState, int x, int y)
 void InstancingGame::Update(DX::StepTimer const & timer)
 {
 	Super::Update(timer);
-
-	m_cbPerFrame.dirLight = m_dirLight;
-	m_cbPerFrame.pointLight = m_pointLight;
-	m_cbPerFrame.spotLight = m_spotLight;
-	m_cbPerFrame.eyePosW = m_eyePos;
-	m_cbPerFrame.fogColor = XMFLOAT4(Colors::Silver);
-	m_cbPerFrame.fogStart = 15.f;
-	m_cbPerFrame.fogRange = 175.f;
-
-	XMMATRIX view = XMLoadFloat4x4(&m_view);
-	XMMATRIX proj = XMLoadFloat4x4(&m_proj);
-	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
-	XMStoreFloat4x4(&m_cbPerFrame.viewProj, XMMatrixTranspose(viewProj));
-
-	m_d3dContext->UpdateSubresource(m_constantBufferPerFrame.Get(), 0, nullptr, &m_cbPerFrame, 0, 0);
 }
 
 void InstancingGame::AddObjects()
@@ -172,7 +157,7 @@ void InstancingGame::PostObjectsRender()
 
 		XMMATRIX worldViewProjTranspose = XMMatrixTranspose(XMMatrixMultiply(XMMatrixMultiply(world, view), proj));
 
-		m_d3dContext->UpdateSubresource(m_pickedTriangle->m_constantBufferPerObject.Get(), 0, nullptr, &worldViewProjTranspose, 0, 0);
+		d3dUtil::UpdateDynamicBufferFromData(m_d3dContext, m_pickedTriangle->m_constantBufferPerObject, worldViewProjTranspose);
 
 		m_d3dContext->IASetInputLayout(m_pickedTriangle->m_inputLayout.Get());
 		UINT stride = sizeof(VertexPositionNormalColor);
@@ -189,17 +174,25 @@ void InstancingGame::PostObjectsRender()
 
 void InstancingGame::BuildConstantBuffer()
 {	
-	// Set per frame constant buffer
-	D3D11_BUFFER_DESC cbDesc;
-	cbDesc.ByteWidth = sizeof(cbPerFrame);
-	cbDesc.Usage = D3D11_USAGE_DEFAULT;
-	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbDesc.CPUAccessFlags = 0;
-	cbDesc.MiscFlags = 0;
-	cbDesc.StructureByteStride = 0;
+	CreateConstantBufferPerFrame(sizeof(cbPerFrame));
+}
 
-	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerFrame.GetAddressOf());
-	DX::ThrowIfFailed(hr);
+void InstancingGame::UpdateConstantBufferPerFrame()
+{
+	m_cbPerFrame.dirLight = m_dirLight;
+	m_cbPerFrame.pointLight = m_pointLight;
+	m_cbPerFrame.spotLight = m_spotLight;
+	m_cbPerFrame.eyePosW = m_eyePos;
+	m_cbPerFrame.fogColor = XMFLOAT4(Colors::Silver);
+	m_cbPerFrame.fogStart = 15.f;
+	m_cbPerFrame.fogRange = 175.f;
+
+	XMMATRIX view = XMLoadFloat4x4(&m_view);
+	XMMATRIX proj = XMLoadFloat4x4(&m_proj);
+	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
+	XMStoreFloat4x4(&m_cbPerFrame.viewProj, XMMatrixTranspose(viewProj));
+
+	d3dUtil::UpdateDynamicBufferFromData(m_d3dContext, m_constantBufferPerFrame, m_cbPerFrame);
 }
 
 void InstancingGame::CalculateFrameStats()
@@ -683,5 +676,5 @@ void PickedTriangle::BuildShape()
 
 void PickedTriangle::BuildConstantBuffer()
 {
-	CreateConstantBuffer(sizeof(XMFLOAT4X4));
+	CreateConstantBufferPerObject(sizeof(XMFLOAT4X4));
 }

@@ -34,9 +34,9 @@ void InitGame::Initialize(HWND window, int width, int height)
 	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
 	XMStoreFloat4x4(&m_view, view);
 
-	float fovAngleY = 45.f * XM_PI / 180.f;
+	m_fovAngleY = 45.f * XM_PI / 180.f;
 	float aspectRatio = m_outputWidth / m_outputHeight;
-	XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, 1.f, 1000.f);
+	XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovLH(m_fovAngleY, aspectRatio, m_nearZ, m_farZ);
 	XMStoreFloat4x4(&m_proj, perspectiveMatrix);
 
 	m_radius = sqrt(pow(m_initCameraY,2)+pow(m_initCameraZ,2));

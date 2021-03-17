@@ -49,26 +49,6 @@ void LitShape::Initialize(
 #endif
 }
 
-void LitShape::Update(DX::StepTimer const & timer)
-{
-	XMMATRIX world = XMLoadFloat4x4(m_world);
-	XMMATRIX view = XMLoadFloat4x4(m_view);
-	XMMATRIX proj = XMLoadFloat4x4(m_proj);
-
-	XMStoreFloat4x4(&m_cbPerObject.world, XMMatrixTranspose(world));
-
-	XMMATRIX worldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, view), proj);
-	world.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-	XMVECTOR det = XMMatrixDeterminant(world);
-	XMMATRIX worldInvTranspose = XMMatrixTranspose(XMMatrixInverse(&det, world));
-
-	// Use XMMatrixTranspose before send to GPU due to HLSL using column-major
-	XMStoreFloat4x4(&m_cbPerObject.worldInvTranspose, XMMatrixTranspose(worldInvTranspose));
-	XMStoreFloat4x4(&m_cbPerObject.worldViewProj, XMMatrixTranspose(worldViewProj));
-
-	m_d3dContext->UpdateSubresource(m_constantBufferPerObject.Get(), 0, nullptr, &m_cbPerObject, 0, 0);
-}
-
 void LitShape::Render()
 {
 	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
@@ -128,30 +108,40 @@ void LitShape::BuildMaterial()
 	m_cbPerObject.material.reflect = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
+void LitShape::UpdateConstantBufferPerObject()
+{
+	XMMATRIX world = XMLoadFloat4x4(m_world);
+	XMMATRIX view = XMLoadFloat4x4(m_view);
+	XMMATRIX proj = XMLoadFloat4x4(m_proj);
+
+	XMStoreFloat4x4(&m_cbPerObject.world, XMMatrixTranspose(world));
+
+	XMMATRIX worldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, view), proj);
+	world.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	XMVECTOR det = XMMatrixDeterminant(world);
+	XMMATRIX worldInvTranspose = XMMatrixTranspose(XMMatrixInverse(&det, world));
+
+	// Use XMMatrixTranspose before send to GPU due to HLSL using column-major
+	XMStoreFloat4x4(&m_cbPerObject.worldInvTranspose, XMMatrixTranspose(worldInvTranspose));
+	XMStoreFloat4x4(&m_cbPerObject.worldViewProj, XMMatrixTranspose(worldViewProj));
+
+	d3dUtil::UpdateDynamicBufferFromData(m_d3dContext, m_constantBufferPerObject, m_cbPerObject);
+}
+
 void LitShape::BuildConstantBuffer()
 {
-	// Set constant buffer
-	D3D11_BUFFER_DESC cbDesc;
-	cbDesc.ByteWidth = sizeof(cbPerObjectStruct);
-	cbDesc.Usage = D3D11_USAGE_DEFAULT;
-	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbDesc.CPUAccessFlags = 0;
-	cbDesc.MiscFlags = 0;
-	cbDesc.StructureByteStride = 0;
-
-	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
-	DX::ThrowIfFailed(hr);
+	CreateConstantBufferPerObject(sizeof(cbPerObjectStruct));
 }
 
 #if USE_VERTEX_COLOR
 #elif USE_TEXTURE_UV
-void LitShape::BuildTextureByName(const wchar_t * fileName)
+void LitShape::BuildTextureByName(const wchar_t * fileName, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& textureView)
 {
 #if USE_DirectXTK
-	HRESULT hr = CreateDDSTextureFromFile(m_d3dDevice.Get(), fileName, nullptr, m_diffuseMapView.GetAddressOf());
+	HRESULT hr = CreateDDSTextureFromFile(m_d3dDevice.Get(), fileName, nullptr, textureView.GetAddressOf());
 #elif USE_D3DX
 	HRESULT hr = D3DX11CreateShaderResourceViewFromFile(
-		m_d3dDevice.Get(), fileName, nullptr, nullptr, m_diffuseMapView.GetAddressOf(), nullptr);
+		m_d3dDevice.Get(), fileName, nullptr, nullptr, textureView.GetAddressOf(), nullptr);
 #endif
 
 	DX::ThrowIfFailed(hr);

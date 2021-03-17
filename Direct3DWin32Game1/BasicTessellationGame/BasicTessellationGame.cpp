@@ -95,5 +95,5 @@ void TessellationHill::BuildShader()
 
 void TessellationHill::BuildTexture()
 {
-	BuildTextureByName(L"TransparentWaveGame\\grass.dds");
+	BuildTextureByName(L"TransparentWaveGame\\grass.dds", m_diffuseMapView);
 }

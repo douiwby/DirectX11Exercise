@@ -16,6 +16,8 @@ public:
 	virtual void Update(DX::StepTimer const& timer) override;
 	virtual void Render() override;
 
+	virtual void UpdateConstantBufferPerObject();
+
 protected:
 
 	virtual void BuildShader();
@@ -27,5 +29,5 @@ protected:
 	Microsoft::WRL::ComPtr<ID3DBlob> m_PSByteCode;
 
 	void CreateVSAndPSShader(const std::wstring& vsFilename, const std::wstring& psFilename, const D3D_SHADER_MACRO* defines = nullptr);
-	void CreateConstantBuffer(UINT bufferSize);
+	void CreateConstantBufferPerObject(UINT bufferSize);
 };

@@ -182,17 +182,7 @@ void Hill::BuildShape()
 
 void Hill::BuildConstantBuffer()
 {
-	// Set constant buffer
-	D3D11_BUFFER_DESC cbDesc;
-	cbDesc.ByteWidth = sizeof(XMFLOAT4X4);
-	cbDesc.Usage = D3D11_USAGE_DEFAULT;
-	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbDesc.CPUAccessFlags = 0;
-	cbDesc.MiscFlags = 0;
-	cbDesc.StructureByteStride = 0;
-
-	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
-	DX::ThrowIfFailed(hr);
+	CreateConstantBufferPerObject(sizeof(XMFLOAT4X4));
 }
 
 Wave::Wave()
@@ -330,17 +320,7 @@ void Wave::BuildShape()
 
 void Wave::BuildConstantBuffer()
 {
-	// Set constant buffer
-	D3D11_BUFFER_DESC cbDesc;
-	cbDesc.ByteWidth = sizeof(XMFLOAT4X4);
-	cbDesc.Usage = D3D11_USAGE_DEFAULT;
-	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbDesc.CPUAccessFlags = 0;
-	cbDesc.MiscFlags = 0;
-	cbDesc.StructureByteStride = 0;
-
-	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
-	DX::ThrowIfFailed(hr);
+	CreateConstantBufferPerObject(sizeof(XMFLOAT4X4));
 }
 
 void Wave::Update(DX::StepTimer const & timer)

@@ -65,6 +65,11 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_renderTargetView;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_depthStencilView;
 
+	float m_nearZ = 1.f;
+	float m_farZ = 1000.f;
+
+	float m_fovAngleY = 1.f;
+
 	DirectX::XMFLOAT4 m_eyePos;
 
 	DirectX::XMFLOAT4X4 m_world;

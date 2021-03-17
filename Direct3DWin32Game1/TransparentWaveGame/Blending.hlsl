@@ -8,6 +8,7 @@
 
 Texture2D gDiffuseMap : register(t0);
 SamplerState gSampler : register(s0);
+TextureCube gCubeMap : register(t1);
 
 SamplerState samAnisotropic
 {
@@ -28,6 +29,10 @@ cbuffer cbPerFrame : register(b0)
 	float4 gFogColor;
 	float gFogStart;
 	float gFogRange;
+
+	float2 pad;
+
+	float4x4 gViewProj;
 };
 
 cbuffer cbPerObject : register(b1)
@@ -113,6 +118,14 @@ float4 PS(VertexOut pin) : SV_Target
 	
 	float4 litColor = texColor * (ambient + diffuse) + spec;
 	//litColor = texColor;
+
+#ifdef SKY_REFLECTION
+	float3 incident = -toEyeW;
+	float3 reflectionVector = reflect(incident, pin.NormalW);
+	float4 reflectionColor = gCubeMap.Sample(gSampler, reflectionVector);
+
+	litColor += gMaterial.Reflect*reflectionColor;
+#endif
 
 #ifdef FOG
 	// Blend the fog color and the lit color.

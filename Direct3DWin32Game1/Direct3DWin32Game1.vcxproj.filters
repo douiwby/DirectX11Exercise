@@ -53,6 +53,9 @@
     <Filter Include="InstancingGame">
       <UniqueIdentifier>{10008044-9459-4a3b-be76-29d51c834efb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SkyGame">
+      <UniqueIdentifier>{5ff1419f-71a9-4e6a-bba0-d0db9a84e676}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -120,6 +123,9 @@
     <ClInclude Include="InstancingGame\InstancingGame.h">
       <Filter>InstancingGame</Filter>
     </ClInclude>
+    <ClInclude Include="SkyGame\SkyGame.h">
+      <Filter>SkyGame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -181,6 +187,9 @@
     <ClCompile Include="InstancingGame\InstancingGame.cpp">
       <Filter>InstancingGame</Filter>
     </ClCompile>
+    <ClCompile Include="SkyGame\SkyGame.cpp">
+      <Filter>SkyGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -234,6 +243,9 @@
     </FxCompile>
     <FxCompile Include="InstancingGame\InstancingObjectWithUV.hlsl">
       <Filter>InstancingGame</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyGame\Sky.hlsl">
+      <Filter>SkyGame</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

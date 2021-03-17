@@ -17,6 +17,8 @@ protected:
 
 	virtual void AddObjects() override;
 
+	virtual void UpdateConstantBufferPerFrame() override;
+
 	struct cbPerFrame
 	{
 		DirectionalLight dirLight;
@@ -27,6 +29,7 @@ protected:
 		float fogStart;
 		float fogRange;
 		DirectX::XMFLOAT2 cbPerFramePad;
+		DirectX::XMFLOAT4X4 viewProj;
 	} m_cbPerFrame;
 };
 
@@ -58,6 +61,12 @@ class Crate : public LitShape
 
 public:
 
+	virtual void Initialize(
+		Microsoft::WRL::ComPtr<ID3D11Device>& device,
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context,
+		DirectX::XMFLOAT4X4* view,
+		DirectX::XMFLOAT4X4* proj) override;
+
 	virtual void Render();
 
 protected:
@@ -70,4 +79,6 @@ protected:
 #elif USE_TEXTURE_UV
 	virtual void BuildTexture();
 #endif
+
+	float m_scale = 5.f;
 };

@@ -23,16 +23,7 @@ void Shape::Initialize(
 // Updates the model.
 void Shape::Update(DX::StepTimer const& timer)
 {
-	XMMATRIX world = XMLoadFloat4x4(m_world);
-	XMMATRIX view = XMLoadFloat4x4(m_view);
-	XMMATRIX proj = XMLoadFloat4x4(m_proj);
-
-	XMMATRIX mWorldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, view), proj);
-	XMFLOAT4X4 cbWorldViewProj;
-	// Use XMMatrixTranspose before send to GPU due to HLSL using column-major
-	XMStoreFloat4x4(&cbWorldViewProj, XMMatrixTranspose(mWorldViewProj));
-
-	m_d3dContext->UpdateSubresource(m_constantBufferPerObject.Get(), 0, nullptr, &cbWorldViewProj, 0, 0);
+	UpdateConstantBufferPerObject();
 }
 
 // Draws the scene.
@@ -87,17 +78,31 @@ void Shape::CreateVSAndPSShader(const std::wstring & vsFilename, const std::wstr
 	DX::ThrowIfFailed(hr);
 }
 
-void Shape::CreateConstantBuffer(UINT bufferSize)
+void Shape::CreateConstantBufferPerObject(UINT bufferSize)
 {
 	// Set constant buffer
 	D3D11_BUFFER_DESC cbDesc;
 	cbDesc.ByteWidth = bufferSize;
-	cbDesc.Usage = D3D11_USAGE_DEFAULT;
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
 	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbDesc.CPUAccessFlags = 0;
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	cbDesc.MiscFlags = 0;
 	cbDesc.StructureByteStride = 0;
 
 	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerObject.GetAddressOf());
 	DX::ThrowIfFailed(hr);
+}
+
+void Shape::UpdateConstantBufferPerObject()
+{
+	XMMATRIX world = XMLoadFloat4x4(m_world);
+	XMMATRIX view = XMLoadFloat4x4(m_view);
+	XMMATRIX proj = XMLoadFloat4x4(m_proj);
+
+	XMMATRIX mWorldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, view), proj);
+	XMFLOAT4X4 cbWorldViewProj;
+	// Use XMMatrixTranspose before send to GPU due to HLSL using column-major
+	XMStoreFloat4x4(&cbWorldViewProj, XMMatrixTranspose(mWorldViewProj));
+
+	d3dUtil::UpdateDynamicBufferFromData(m_d3dContext, m_constantBufferPerObject, cbWorldViewProj);
 }

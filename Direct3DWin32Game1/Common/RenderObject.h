@@ -17,6 +17,8 @@ public:
 	virtual void Update(DX::StepTimer const& timer) = 0;
 	virtual void Render() = 0;
 
+	void WorldTransform(DirectX::XMMATRIX& trans);
+
 protected:
 
 	Microsoft::WRL::ComPtr<ID3D11Device>			m_d3dDevice;

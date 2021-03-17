@@ -30,12 +30,15 @@ void MultiObjectGame::Tick()
 			Clear();
 		}
 
+		for (auto it = m_objects.begin(); it != m_objects.end(); ++it)
+		{
+			(*it)->Update(m_timer);
+		}
+
 		PreObjectsRender();
 
 		for (auto it = m_objects.begin(); it != m_objects.end(); ++it)
 		{
-			(*it)->Update(m_timer);
-
 			if (bDraw)
 			{
 				(*it)->Render();

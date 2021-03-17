@@ -47,6 +47,8 @@ protected:
 
 	virtual void BuildConstantBuffer() override;
 
+	virtual void UpdateConstantBufferPerFrame() override;
+
 	virtual void CalculateFrameStats() override;
 
 	void BuildInstancedBuffer();

@@ -18,31 +18,14 @@ void TransparentWaveGame::BuildLight()
 
 void TransparentWaveGame::BuildConstantBuffer()
 {
-	// Set per frame constant buffer
-	D3D11_BUFFER_DESC cbDesc;
-	cbDesc.ByteWidth = sizeof(cbPerFrame);
-	cbDesc.Usage = D3D11_USAGE_DEFAULT;
-	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbDesc.CPUAccessFlags = 0;
-	cbDesc.MiscFlags = 0;
-	cbDesc.StructureByteStride = 0;
-
-	HRESULT hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBufferPerFrame.GetAddressOf());
-	DX::ThrowIfFailed(hr);
+	// Do not just use Super::CreateConstantBufferPerFrame
+	// because cbPerFrame is different in super class
+	CreateConstantBufferPerFrame(sizeof(cbPerFrame));
 }
 
 void TransparentWaveGame::Update(DX::StepTimer const & timer)
 {
 	Super::Update(timer);
-
-	m_cbPerFrame.dirLight = m_dirLight;
-	m_cbPerFrame.pointLight = m_pointLight;
-	m_cbPerFrame.spotLight = m_spotLight;
-	m_cbPerFrame.eyePosW = m_eyePos;
-	m_cbPerFrame.fogColor = XMFLOAT4(Colors::Silver);
-	m_cbPerFrame.fogStart = 15.f;
-	m_cbPerFrame.fogRange = 175.f;
-	m_d3dContext->UpdateSubresource(m_constantBufferPerFrame.Get(), 0, nullptr, &m_cbPerFrame, 0, 0);
 }
 
 void TransparentWaveGame::AddObjects()
@@ -50,6 +33,24 @@ void TransparentWaveGame::AddObjects()
 	m_objects.push_back(new TextureHill());
 	m_objects.push_back(new Crate());
 	m_objects.push_back(new TransparentWave());
+}
+
+void TransparentWaveGame::UpdateConstantBufferPerFrame()
+{
+	m_cbPerFrame.dirLight = m_dirLight;
+	m_cbPerFrame.pointLight = m_pointLight;
+	m_cbPerFrame.spotLight = m_spotLight;
+	m_cbPerFrame.eyePosW = m_eyePos;
+	m_cbPerFrame.fogColor = XMFLOAT4(Colors::Silver);
+	m_cbPerFrame.fogStart = 15.f;
+	m_cbPerFrame.fogRange = 175.f;
+
+	XMMATRIX view = XMLoadFloat4x4(&m_view);
+	XMMATRIX proj = XMLoadFloat4x4(&m_proj);
+	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
+	XMStoreFloat4x4(&m_cbPerFrame.viewProj, XMMatrixTranspose(viewProj));
+
+	d3dUtil::UpdateDynamicBufferFromData(m_d3dContext, m_constantBufferPerFrame, m_cbPerFrame);
 }
 
 void TextureHill::BuildShader()
@@ -113,6 +114,13 @@ void TransparentWave::Render()
 	
 	m_d3dContext->OMSetBlendState(nullptr, blendFactors, UINT_MAX);
 	m_d3dContext->PSSetSamplers(0, 1, previousSamplerState.GetAddressOf());
+}
+
+void Crate::Initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context, DirectX::XMFLOAT4X4 * view, DirectX::XMFLOAT4X4 * proj)
+{
+	Super::Initialize(device, context, view, proj);
+
+	WorldTransform(XMMatrixTranslation(0.f, 3.f, 0.f));
 }
 
 void Crate::Render()
@@ -184,17 +192,12 @@ void Crate::BuildShape()
 		{ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.f,1.f) }
 	};
 
-	float scale = 5.f;
-	float positionOffset = 3.f;
-
 	int vertexCount = ARRAYSIZE(vertices);
 	for (int i = 0; i < vertexCount; ++i)
 	{
-		vertices[i].position.x *= scale;
-		vertices[i].position.y *= scale;
-		vertices[i].position.z *= scale;
-
-		vertices[i].position.y += positionOffset;
+		vertices[i].position.x *= m_scale;
+		vertices[i].position.y *= m_scale;
+		vertices[i].position.z *= m_scale;
 	}
 
 	D3D11_BUFFER_DESC vbDesc;
@@ -291,7 +294,7 @@ void Crate::BuildShader()
 
 void Crate::BuildTexture()
 {
-	BuildTextureByName(L"TransparentWaveGame\\WireFence.dds");
+	BuildTextureByName(L"TransparentWaveGame\\WireFence.dds", m_diffuseMapView);
 }
 
 #endif

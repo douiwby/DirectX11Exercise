@@ -16,8 +16,9 @@ public:
 		DirectX::XMFLOAT4X4* view,
 		DirectX::XMFLOAT4X4* proj) override;
 
-	virtual void Update(DX::StepTimer const& timer) override;
 	virtual void Render() override;
+
+	virtual void UpdateConstantBufferPerObject() override;
 
 protected:
 
@@ -29,7 +30,7 @@ protected:
 #if USE_VERTEX_COLOR
 #elif USE_TEXTURE_UV
 	virtual void BuildTexture() = 0;
-	virtual void BuildTextureByName(const wchar_t* fileName);
+	virtual void BuildTextureByName(const wchar_t * fileName, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& textureView);
 #endif
 
 	struct cbPerObjectStruct
