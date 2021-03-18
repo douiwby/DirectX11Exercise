@@ -56,6 +56,9 @@
     <Filter Include="SkyGame">
       <UniqueIdentifier>{5ff1419f-71a9-4e6a-bba0-d0db9a84e676}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NormalMapGame">
+      <UniqueIdentifier>{50a43073-5916-43cc-9a51-6664a002a27a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -126,6 +129,12 @@
     <ClInclude Include="SkyGame\SkyGame.h">
       <Filter>SkyGame</Filter>
     </ClInclude>
+    <ClInclude Include="NormalMapGame\NormalMapGame.h">
+      <Filter>NormalMapGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\GeometryGenerator.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -190,6 +199,12 @@
     <ClCompile Include="SkyGame\SkyGame.cpp">
       <Filter>SkyGame</Filter>
     </ClCompile>
+    <ClCompile Include="NormalMapGame\NormalMapGame.cpp">
+      <Filter>NormalMapGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\GeometryGenerator.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -246,6 +261,9 @@
     </FxCompile>
     <FxCompile Include="SkyGame\Sky.hlsl">
       <Filter>SkyGame</Filter>
+    </FxCompile>
+    <FxCompile Include="NormalMapGame\NormalMap.hlsl">
+      <Filter>NormalMapGame</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

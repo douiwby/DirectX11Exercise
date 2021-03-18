@@ -18,9 +18,10 @@
 #include "BasicTessellationGame/BasicTessellationGame.h"
 #include "InstancingGame/InstancingGame.h"
 #include "SkyGame/SkyGame.h"
+#include "NormalMapGame/NormalMapGame.h"
 
 using namespace DirectX;
-using TargetGame = SkyGame;
+using TargetGame = NormalMapGame;
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wcovered-switch-default"

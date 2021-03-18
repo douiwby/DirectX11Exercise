@@ -100,7 +100,7 @@ protected:
 
 	virtual void RenderInternal(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& cubeMapSRV);
 
-	bool bUsingDynamicCubeMap = true;
+	bool bUsingDynamicCubeMap = false;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cubeMapView;
 };
 

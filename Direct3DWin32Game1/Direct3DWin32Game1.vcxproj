@@ -170,6 +170,7 @@
     <ClInclude Include="BlurWaveGame\BlurWaveGame.h" />
     <ClInclude Include="BoxGame\BoxGame.h" />
     <ClInclude Include="Common\d3dUtil.h" />
+    <ClInclude Include="Common\GeometryGenerator.h" />
     <ClInclude Include="CrateGame\CrateGame.h" />
     <ClInclude Include="HillAndWaveGame\HillAndWaveGame.h" />
     <ClInclude Include="HillGame\HillGame.h" />
@@ -184,6 +185,7 @@
     <ClInclude Include="Common\Shape.h" />
     <ClInclude Include="Common\VertexStructuer.h" />
     <ClInclude Include="MultiShapeGame\MultiShapeGame.h" />
+    <ClInclude Include="NormalMapGame\NormalMapGame.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SkyGame\SkyGame.h" />
     <ClInclude Include="StepTimer.h" />
@@ -196,6 +198,7 @@
     <ClCompile Include="BlurWaveGame\BlurWaveGame.cpp" />
     <ClCompile Include="BoxGame\BoxGame.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
+    <ClCompile Include="Common\GeometryGenerator.cpp" />
     <ClCompile Include="CrateGame\CrateGame.cpp" />
     <ClCompile Include="HillAndWaveGame\HillAndWaveGame.cpp" />
     <ClCompile Include="HillGame\HillGame.cpp" />
@@ -209,6 +212,7 @@
     <ClCompile Include="Common\RenderObject.cpp" />
     <ClCompile Include="Common\Shape.cpp" />
     <ClCompile Include="MultiShapeGame\MultiShapeGame.cpp" />
+    <ClCompile Include="NormalMapGame\NormalMapGame.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -275,6 +279,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="LitHillGame\Lighting.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="NormalMapGame\NormalMap.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

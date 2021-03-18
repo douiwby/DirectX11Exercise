@@ -33,6 +33,8 @@ void SkyGame::AddObjects()
 	//m_reflectObject = new ReflectBox();
 	m_reflectObject = new ReflectSphere();
 	m_objects.push_back(m_reflectObject);
+
+	m_reflectObject->bUsingDynamicCubeMap = true;
 }
 
 void SkyGame::PreObjectsRender()

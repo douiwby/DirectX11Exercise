@@ -8,6 +8,7 @@
 class LitShape : public Shape
 {
 	using Super = Shape;
+
 public:
 
 	virtual void Initialize(
