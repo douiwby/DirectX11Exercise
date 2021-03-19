@@ -34,9 +34,7 @@ void InitGame::Initialize(HWND window, int width, int height)
 	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
 	XMStoreFloat4x4(&m_view, view);
 
-	m_fovAngleY = 45.f * XM_PI / 180.f;
-	float aspectRatio = m_outputWidth / m_outputHeight;
-	XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovLH(m_fovAngleY, aspectRatio, m_nearZ, m_farZ);
+	XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovLH(m_fovAngleY, AspectRatio(), m_nearZ, m_farZ);
 	XMStoreFloat4x4(&m_proj, perspectiveMatrix);
 
 	m_radius = sqrt(pow(m_initCameraY,2)+pow(m_initCameraZ,2));
@@ -84,6 +82,9 @@ void InitGame::OnWindowSizeChanged(int width, int height)
 
 	CreateResources();
 
+	XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovLH(m_fovAngleY, AspectRatio(), m_nearZ, m_farZ);
+	XMStoreFloat4x4(&m_proj, perspectiveMatrix);
+
 	// TODO: Game window is being resized.
 }
 
@@ -93,6 +94,11 @@ void InitGame::GetDefaultSize(int& width, int& height) const noexcept
 	// TODO: Change to desired default window size (note minimum size is 320x200).
 	width = 800;
 	height = 600;
+}
+
+inline float InitGame::AspectRatio() const
+{
+	return static_cast<float>(m_outputWidth) / m_outputHeight;
 }
 
 // Updates the world.

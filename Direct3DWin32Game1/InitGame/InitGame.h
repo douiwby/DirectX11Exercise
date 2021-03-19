@@ -26,6 +26,8 @@ public:
 	// Properties
 	void GetDefaultSize(int& width, int& height) const noexcept;
 
+	inline float AspectRatio() const;
+
 	virtual void OnMouseDown(WPARAM btnState, int x, int y);
 	virtual void OnMouseUp(WPARAM btnState, int x, int y);
 	virtual void OnMouseMove(WPARAM btnState, int x, int y);
@@ -68,7 +70,7 @@ protected:
 	float m_nearZ = 1.f;
 	float m_farZ = 1000.f;
 
-	float m_fovAngleY = 1.f;
+	float m_fovAngleY = 45.f * DirectX::XM_PI / 180.f;
 
 	DirectX::XMFLOAT4 m_eyePos;
 
