@@ -28,7 +28,7 @@ protected:
 
 	void RenderDynamicCubeMapTexture();
 
-	void GenerateViewMatrixByIndex(int i, DirectX::XMMATRIX& view);
+	void GenerateViewMatrixByIndex(float x, float y, float z, int i, DirectX::XMMATRIX& view);
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_dynamicCubeMapTexture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_dynamicCubeMapSRV;

@@ -128,7 +128,7 @@ void SkyGame::RenderDynamicCubeMapTexture()
 	for (int i = 0; i < 6; ++i)
 	{
 		XMMATRIX view = XMLoadFloat4x4(&m_view);
-		GenerateViewMatrixByIndex(i, view);
+		GenerateViewMatrixByIndex(m_reflectObject->m_world->_41, m_reflectObject->m_world->_42, m_reflectObject->m_world->_43, i, view);
 
 		XMStoreFloat4x4(&m_view, view);
 		XMStoreFloat4x4(&m_cbPerFrame.viewProj, XMMatrixTranspose(XMMatrixMultiply(view, proj)));
@@ -177,12 +177,8 @@ void SkyGame::RenderDynamicCubeMapTexture()
 	}
 }
 
-void SkyGame::GenerateViewMatrixByIndex(int i, DirectX::XMMATRIX & view)
+void SkyGame::GenerateViewMatrixByIndex(float x, float y, float z, int i, DirectX::XMMATRIX & view)
 {
-	float x = m_radius * sinf(m_phi)*cosf(m_theta);
-	float z = m_radius * sinf(m_phi)*sinf(m_theta);
-	float y = m_radius * cosf(m_phi);
-
 	// Generate the cube map about the given position.
 	XMFLOAT4 center(x, y, z, 1.f);
 
