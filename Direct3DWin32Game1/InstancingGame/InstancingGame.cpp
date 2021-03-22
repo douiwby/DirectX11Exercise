@@ -23,9 +23,9 @@ void InstancingGame::Initialize(HWND window, int width, int height)
 	BuildInstancedBuffer();
 }
 
-void InstancingGame::OnKeyButtonPressed(WPARAM key)
+void InstancingGame::OnKeyButtonReleased(WPARAM key)
 {
-	Super::OnKeyButtonPressed(key);
+	Super::OnKeyButtonReleased(key);
 
 	if (key == 'C')
 	{
@@ -42,7 +42,11 @@ void InstancingGame::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	Super::OnMouseDown(btnState, x, y);
 
-	if ((btnState & MK_RBUTTON) != 0)
+	if (bUsingOrbitCamera && ((btnState & MK_RBUTTON) != 0))
+	{
+		Pick(x, y);
+	}
+	else if (!bUsingOrbitCamera && ((btnState & MK_LBUTTON) != 0))
 	{
 		Pick(x, y);
 	}

@@ -111,42 +111,44 @@ void MirrorGame::UpdateLightPosition(DX::StepTimer const & timer)
 	// Control the spot light by keyboard.
 	// Key map
 	// https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-
-	// Use keyboard to control the position
-	float movingSpeed = 15.0f;
-	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+	if (!((GetAsyncKeyState(MK_RBUTTON) & 0x8000) || (GetAsyncKeyState(MK_LBUTTON) & 0x8000)))
 	{
-		m_spotLight.Position.x -= movingSpeed * elapsedTime;
-	}
-	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
-		m_spotLight.Position.x += movingSpeed * elapsedTime;
+		// Use keyboard to control the position
+		float movingSpeed = 15.0f;
+		if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+		{
+			m_spotLight.Position.x -= movingSpeed * elapsedTime;
+		}
+		if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+			m_spotLight.Position.x += movingSpeed * elapsedTime;
 
-	if (GetAsyncKeyState(VK_UP) & 0x8000)
-		m_spotLight.Position.z += movingSpeed * elapsedTime;
+		if (GetAsyncKeyState(VK_UP) & 0x8000)
+			m_spotLight.Position.z += movingSpeed * elapsedTime;
 
-	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
-		m_spotLight.Position.z -= movingSpeed * elapsedTime;
+		if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+			m_spotLight.Position.z -= movingSpeed * elapsedTime;
 
-	float rotateSpeed = 45.f / 180.f * XM_PI;
- 	if (GetAsyncKeyState(0x41) & 0x8000)  // A key
- 	{
-		float theta = -rotateSpeed * elapsedTime;
-		RotateVectorByZAxis(m_spotLight.Direction, theta);
- 	}
- 	if (GetAsyncKeyState(0x44) & 0x8000)  // D key
- 	{
-		float theta = rotateSpeed * elapsedTime;
-		RotateVectorByZAxis(m_spotLight.Direction, theta);
-	}
-	if (GetAsyncKeyState(0x57) & 0x8000)  // W key
-	{
-		float theta = -rotateSpeed * elapsedTime;
-		RotateVectorByXAxis(m_spotLight.Direction, theta);
-	}
-	if (GetAsyncKeyState(0x53) & 0x8000)  // S key
-	{
-		float theta = rotateSpeed * elapsedTime;
-		RotateVectorByXAxis(m_spotLight.Direction, theta);
+		float rotateSpeed = 45.f / 180.f * XM_PI;
+		if (GetAsyncKeyState(0x41) & 0x8000)  // A key
+		{
+			float theta = -rotateSpeed * elapsedTime;
+			RotateVectorByZAxis(m_spotLight.Direction, theta);
+		}
+		if (GetAsyncKeyState(0x44) & 0x8000)  // D key
+		{
+			float theta = rotateSpeed * elapsedTime;
+			RotateVectorByZAxis(m_spotLight.Direction, theta);
+		}
+		if (GetAsyncKeyState(0x57) & 0x8000)  // W key
+		{
+			float theta = -rotateSpeed * elapsedTime;
+			RotateVectorByXAxis(m_spotLight.Direction, theta);
+		}
+		if (GetAsyncKeyState(0x53) & 0x8000)  // S key
+		{
+			float theta = rotateSpeed * elapsedTime;
+			RotateVectorByXAxis(m_spotLight.Direction, theta);
+		}
 	}
 }
 

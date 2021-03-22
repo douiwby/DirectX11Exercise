@@ -28,11 +28,12 @@ void InitGame::Initialize(HWND window, int width, int height)
 
 	XMStoreFloat4x4(&m_world, XMMatrixIdentity());
 
-	XMVECTOR pos = XMVectorSet(0.f, m_initCameraY, m_initCameraZ, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&m_view, view);
+	m_pos = XMVectorSet(0.f, m_initCameraY, m_initCameraZ, 1.0f);
+	m_target = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	m_dir = XMVector3Normalize(m_target - m_pos);
+	m_up = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+	UpdateCamera();
 
 	XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovLH(m_fovAngleY, AspectRatio(), m_nearZ, m_farZ);
 	XMStoreFloat4x4(&m_proj, perspectiveMatrix);
@@ -106,25 +107,57 @@ void InitGame::Update(DX::StepTimer const& timer)
 {
 	float elapsedTime = float(timer.GetElapsedSeconds());
 
-	if (bAutoRotate)
+	if (bUsingOrbitCamera)
 	{
-		m_theta += m_rotateSpeed * elapsedTime;
+		if (bAutoRotate)
+		{
+			m_theta += m_rotateSpeed * elapsedTime;
+		}
+
+		// Convert Spherical to Cartesian coordinates.
+		float x = m_radius * sinf(m_phi)*cosf(m_theta);
+		float z = m_radius * sinf(m_phi)*sinf(m_theta);
+		float y = m_radius * cosf(m_phi);
+
+		// Build the view matrix.
+		m_pos = XMVectorSet(x, y, z, 1.0f);
+		m_target = XMVectorZero();
+	}
+	else
+	{
+		XMVECTOR cameraRight = XMVector3Normalize(XMVector3Cross(m_up, m_dir));
+		XMVECTOR cameraUp = XMVector3Normalize(XMVector3Cross(m_dir, cameraRight));
+		XMVECTOR cameraForward = XMVector3Normalize(m_dir);
+
+		if (bCameraShouldMoveUp)
+		{
+			m_pos = XMVector3TransformCoord(m_pos, XMMatrixTranslationFromVector(m_cameraMoveRate*elapsedTime*cameraUp));
+		}
+		else if (bCameraShouldMoveDown)
+		{
+			m_pos = XMVector3TransformCoord(m_pos, XMMatrixTranslationFromVector(-m_cameraMoveRate*elapsedTime*cameraUp));
+		}
+
+		if (bCameraShouldMoveRight)
+		{
+			m_pos = XMVector3TransformCoord(m_pos, XMMatrixTranslationFromVector(m_cameraMoveRate*elapsedTime*cameraRight));
+		}
+		else if (bCameraShouldMoveLeft)
+		{
+			m_pos = XMVector3TransformCoord(m_pos, XMMatrixTranslationFromVector(-m_cameraMoveRate*elapsedTime*cameraRight));
+		}
+
+		if (bCameraShouldMoveForward)
+		{
+			m_pos = XMVector3TransformCoord(m_pos, XMMatrixTranslationFromVector(m_cameraMoveRate*elapsedTime*cameraForward));
+		}
+		else if (bCameraShouldMoveBack)
+		{
+			m_pos = XMVector3TransformCoord(m_pos, XMMatrixTranslationFromVector(-m_cameraMoveRate*elapsedTime*cameraForward));
+		}
 	}
 
-	// Convert Spherical to Cartesian coordinates.
-	float x = m_radius * sinf(m_phi)*cosf(m_theta);
-	float z = m_radius * sinf(m_phi)*sinf(m_theta);
-	float y = m_radius * cosf(m_phi);
-
-	// Build the view matrix.
-	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	XMStoreFloat4(&m_eyePos, pos);
-
-	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&m_view, V);
+	UpdateCamera();
 }
 
 // Draws the scene.
@@ -385,52 +418,111 @@ void InitGame::CalculateFrameStats()
 	}
 }
 
+void InitGame::UpdateCamera()
+{
+	XMStoreFloat4(&m_eyePos, m_pos);
+
+	if (bUsingOrbitCamera)
+	{
+		XMMATRIX V = XMMatrixLookAtLH(m_pos, m_target, m_up);
+		XMStoreFloat4x4(&m_view, V);
+	}
+	else
+	{
+		XMMATRIX V = XMMatrixLookToLH(m_pos, m_dir, m_up);
+		XMStoreFloat4x4(&m_view, V);
+	}
+}
+
 void InitGame::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	m_lastMousePos.x = x;
 	m_lastMousePos.y = y;
 
 	SetCapture(m_window);
+
+	if ((btnState & MK_RBUTTON) != 0)
+	{
+		bCameraMoveMode = true;
+	}
 }
 
 void InitGame::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	ReleaseCapture();
+
+	if ((btnState & MK_RBUTTON) != 0)
+	{
+		bCameraMoveMode = false;
+	}
 }
 
 void InitGame::OnMouseMove(WPARAM btnState, int x, int y)
 {
-	if ((btnState & MK_LBUTTON) != 0)
+	if (bUsingOrbitCamera)
 	{
-		// Make each pixel correspond to a quarter of a degree.
-		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - m_lastMousePos.x));
-		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - m_lastMousePos.y));
-
-		// Update angles based on input to orbit camera around box.
-		if (!bAutoRotate)
+		if ((btnState & MK_LBUTTON) != 0)
 		{
-			m_theta += dx;
+			// Make each pixel correspond to a quarter of a degree.
+			float dx = XMConvertToRadians(0.25f*static_cast<float>(x - m_lastMousePos.x));
+			float dy = XMConvertToRadians(0.25f*static_cast<float>(y - m_lastMousePos.y));
+
+			// Update angles based on input to orbit camera around box.
+			if (!bAutoRotate)
+			{
+				m_theta += dx;
+			}
+			m_phi += dy;
+
+			// Restrict the angle mPhi.
+			m_phi = DX::Clamp(m_phi, 0.1f, XM_PI - 0.1f);
 		}
-		m_phi += dy;
+		else if ((btnState & MK_RBUTTON) != 0)
+		{
+			// Make each pixel correspond to 0.01 unit in the scene.
+			float dx = 0.01f*static_cast<float>(x - m_lastMousePos.x);
+			float dy = 0.01f*static_cast<float>(y - m_lastMousePos.y);
 
-		// Restrict the angle mPhi.
-		m_phi = DX::Clamp(m_phi, 0.1f, XM_PI - 0.1f);
+			// Update the camera radius based on input.
+			m_radius += (dx - dy) * m_mouseMoveRate;
+
+			// Restrict the radius.
+			m_radius = DX::Clamp(m_radius, m_minRadius, m_maxRadius);
+		}
 	}
-	else if ((btnState & MK_RBUTTON) != 0)
+	else
 	{
-		// Make each pixel correspond to 0.01 unit in the scene.
-		float dx = 0.01f*static_cast<float>(x - m_lastMousePos.x);
-		float dy = 0.01f*static_cast<float>(y - m_lastMousePos.y);
+		if ((btnState & MK_RBUTTON) != 0)
+		{
+			// Make each pixel correspond to 0.01 unit in the scene.
+			float dx = 0.01f*static_cast<float>(x - m_lastMousePos.x);
+			float dy = 0.01f*static_cast<float>(y - m_lastMousePos.y);
 
-		// Update the camera radius based on input.
-		m_radius += (dx - dy) * m_mouseMoveRate;
-
-		// Restrict the radius.
-		m_radius = DX::Clamp(m_radius, m_minRadius, m_maxRadius);
+			m_dir = XMVector3Normalize(XMVector3TransformNormal(m_dir, XMMatrixRotationY(dx*m_rotateCameraRate)));
+			XMVECTOR cameraRight = XMVector3Normalize(XMVector3Cross(m_up, m_dir));
+			m_dir = XMVector3Normalize(XMVector3TransformNormal(m_dir, XMMatrixRotationAxis(cameraRight,dy*m_rotateCameraRate)));
+		}
 	}
 
 	m_lastMousePos.x = x;
 	m_lastMousePos.y = y;
+}
+
+void InitGame::OnMouseWheelMove(WPARAM wParam)
+{
+	float delta = GET_WHEEL_DELTA_WPARAM(wParam);
+	if (delta > 0)
+	{
+		m_cameraMoveRate *= 2;
+		float maximumMoveRate = 200.f;
+		m_cameraMoveRate = m_cameraMoveRate > maximumMoveRate ? maximumMoveRate : m_cameraMoveRate;
+	}
+	else
+	{
+		m_cameraMoveRate *= 0.5;
+		float lowestMoveRate = 0.5f;
+		m_cameraMoveRate = m_cameraMoveRate < lowestMoveRate ? lowestMoveRate : m_cameraMoveRate;
+	}
 }
 
 void InitGame::ToggleWireframe()
@@ -455,7 +547,47 @@ void InitGame::ToggleAutoRotate()
 	bAutoRotate = !bAutoRotate;
 }
 
+void InitGame::ToggleCameraMode()
+{
+	bUsingOrbitCamera = !bUsingOrbitCamera;
+}
+
 void InitGame::OnKeyButtonPressed(WPARAM key)
+{
+	if (!bUsingOrbitCamera)
+	{
+		// Move camera when right mouse down
+		if (GetAsyncKeyState(MK_RBUTTON) & 0x8000)
+		{
+			if (key == 'Q')
+			{
+				bCameraShouldMoveDown = true;
+			}
+			if (key == 'E')
+			{
+				bCameraShouldMoveUp = true;
+			}
+			if (key == 'D')
+			{
+				bCameraShouldMoveRight = true;
+			}
+			if (key == 'A')
+			{
+				bCameraShouldMoveLeft = true;
+			}
+			if (key == 'W')
+			{
+				bCameraShouldMoveForward = true;
+			}
+			if (key == 'S')
+			{
+				bCameraShouldMoveBack = true;
+			}
+		}
+	}
+}
+
+void InitGame::OnKeyButtonReleased(WPARAM key)
 {
 	if (key == 'F')
 	{
@@ -465,5 +597,52 @@ void InitGame::OnKeyButtonPressed(WPARAM key)
 	if (key == 'G')
 	{
 		ToggleAutoRotate();
+	}
+
+	if (key == 'C')
+	{
+		ToggleCameraMode();
+	}
+
+	if (!bUsingOrbitCamera)
+	{
+		// Stop move camera when right mouse up
+		{
+			if (key == 'Q')
+			{
+				bCameraShouldMoveDown = false;
+			}
+			if (key == 'E')
+			{
+				bCameraShouldMoveUp = false;
+			}
+			if (key == 'D')
+			{
+				bCameraShouldMoveRight = false;
+			}
+			if (key == 'A')
+			{
+				bCameraShouldMoveLeft = false;
+			}
+			if (key == 'W')
+			{
+				bCameraShouldMoveForward = false;
+			}
+			if (key == 'S')
+			{
+				bCameraShouldMoveBack = false;
+			}
+		}
+
+		// Reset the camera
+		if (key == 'O')
+		{
+			m_pos = XMVectorSet(0.f, m_initCameraY, m_initCameraZ, 1.0f);
+			m_target = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+			m_dir = XMVector3Normalize(m_target - m_pos);
+			m_up = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+			UpdateCamera();
+		}
 	}
 }

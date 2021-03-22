@@ -94,46 +94,49 @@ void LitHillGame::UpdateLightPosition(DX::StepTimer const & timer)
 	float z = m_pointLight.Position.z;
 	m_pointLight.Position.y = fmaxf(0.3f*(z*sinf(0.1f*x) + x * cosf(0.1f*z)), -3.0f) + 10.0f;
 
+
 	// Control the spot light by keyboard.
 	// Key map
 	// https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-
-	// Use keyboard to control the position
-	float movingSpeed = 40.0f;
-	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+	if (! ( (GetAsyncKeyState(MK_RBUTTON) & 0x8000) || (GetAsyncKeyState(MK_LBUTTON) & 0x8000) ) )
 	{
-		m_spotLight.Position.x -= movingSpeed * elapsedTime;
-	}
+		// Use keyboard to control the position
+		float movingSpeed = 40.0f;
+		if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+		{
+			m_spotLight.Position.x -= movingSpeed * elapsedTime;
+		}
 
-	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
-		m_spotLight.Position.x += movingSpeed * elapsedTime;
+		if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+			m_spotLight.Position.x += movingSpeed * elapsedTime;
 
-	if (GetAsyncKeyState(VK_UP) & 0x8000)
-		m_spotLight.Position.z += movingSpeed * elapsedTime;
+		if (GetAsyncKeyState(VK_UP) & 0x8000)
+			m_spotLight.Position.z += movingSpeed * elapsedTime;
 
-	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
-		m_spotLight.Position.z -= movingSpeed * elapsedTime;
+		if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+			m_spotLight.Position.z -= movingSpeed * elapsedTime;
 
-	float rotateSpeed = 45.f / 180.f * XM_PI;
-	if (GetAsyncKeyState('A') & 0x8000)  // A key
-	{
-		float theta = -rotateSpeed * elapsedTime;
-		RotateVectorByZAxis(m_spotLight.Direction, theta);
-	}
-	if (GetAsyncKeyState('D') & 0x8000)  // D key
-	{
-		float theta = rotateSpeed * elapsedTime;
-		RotateVectorByZAxis(m_spotLight.Direction, theta);
-	}
-	if (GetAsyncKeyState(0x57) & 0x8000)  // W key
-	{
-		float theta = -rotateSpeed * elapsedTime;
-		RotateVectorByXAxis(m_spotLight.Direction, theta);
-	}
-	if (GetAsyncKeyState(0x53) & 0x8000)  // S key
-	{
-		float theta = rotateSpeed * elapsedTime;
-		RotateVectorByXAxis(m_spotLight.Direction, theta);
+		float rotateSpeed = 45.f / 180.f * XM_PI;
+		if (GetAsyncKeyState('A') & 0x8000)  // A key
+		{
+			float theta = -rotateSpeed * elapsedTime;
+			RotateVectorByZAxis(m_spotLight.Direction, theta);
+		}
+		if (GetAsyncKeyState('D') & 0x8000)  // D key
+		{
+			float theta = rotateSpeed * elapsedTime;
+			RotateVectorByZAxis(m_spotLight.Direction, theta);
+		}
+		if (GetAsyncKeyState(0x57) & 0x8000)  // W key
+		{
+			float theta = -rotateSpeed * elapsedTime;
+			RotateVectorByXAxis(m_spotLight.Direction, theta);
+		}
+		if (GetAsyncKeyState(0x53) & 0x8000)  // S key
+		{
+			float theta = rotateSpeed * elapsedTime;
+			RotateVectorByXAxis(m_spotLight.Direction, theta);
+		}
 	}
 }
 

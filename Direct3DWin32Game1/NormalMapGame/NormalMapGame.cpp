@@ -13,9 +13,9 @@ void NormalMapGame::Initialize(HWND window, int width, int height)
 	m_reflectObject->WorldTransform(XMMatrixTranslation(0.f, 30.f, 0.f));
 }
 
-void NormalMapGame::OnKeyButtonPressed(WPARAM key)
+void NormalMapGame::OnKeyButtonReleased(WPARAM key)
 {
-	Super::OnKeyButtonPressed(key);
+	Super::OnKeyButtonReleased(key);
 
 	// Toggle normal map on/off
 	if (key == 'N')

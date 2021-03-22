@@ -9,7 +9,7 @@ public:
 
 	virtual void Initialize(HWND window, int width, int height) override;
 
-	virtual void OnKeyButtonPressed(WPARAM key) override;
+	virtual void OnKeyButtonReleased(WPARAM key) override;
 
 protected:
 

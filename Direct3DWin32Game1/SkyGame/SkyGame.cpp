@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SkyGame/SkyGame.h"
+#include "Common/GeometryGenerator.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -29,6 +30,7 @@ void SkyGame::AddObjects()
 	Super::AddObjects();
 
 	m_objects.push_back(new SkyBox());
+	//m_objects.push_back(new SkySphere());
 
 	//m_reflectObject = new ReflectBox();
 	m_reflectObject = new ReflectSphere();
@@ -542,6 +544,61 @@ void ReflectSphere::BuildShape()
 		indices.push_back(baseIndex + i);
 		indices.push_back(baseIndex + i + 1);
 	}
+
+	D3D11_BUFFER_DESC vbDesc;
+	vbDesc.ByteWidth = sizeof(VertexType) * vertices.size();
+	vbDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbDesc.CPUAccessFlags = 0;
+	vbDesc.MiscFlags = 0;
+	vbDesc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA vbInitData;
+	vbInitData.pSysMem = vertices.data();
+	vbInitData.SysMemPitch = 0;
+	vbInitData.SysMemSlicePitch = 0;
+
+	HRESULT hr = m_d3dDevice->CreateBuffer(&vbDesc, &vbInitData, m_vertexBuffer.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+
+	m_indexCount = indices.size();
+
+	D3D11_BUFFER_DESC ibDesc;
+	ibDesc.ByteWidth = sizeof(UINT) * indices.size();
+	ibDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	ibDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibDesc.CPUAccessFlags = 0;
+	ibDesc.MiscFlags = 0;
+	ibDesc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA ibInitData;
+	ibInitData.pSysMem = indices.data();
+	ibInitData.SysMemPitch = 0;
+	ibInitData.SysMemSlicePitch = 0;
+
+	hr = m_d3dDevice->CreateBuffer(&ibDesc, &ibInitData, m_indexBuffer.GetAddressOf());
+	DX::ThrowIfFailed(hr);
+}
+
+void SkySphere::BuildShape()
+{
+	using VertexType = VertexPositionNormalUV;
+
+	GeometryGenerator geo;
+	GeometryGenerator::MeshData meshData;
+	float radius = sqrt(m_length*m_length + m_height * m_height + m_width * m_width);
+	geo.CreateSphere(radius, 20, 20, meshData);
+
+	std::vector<VertexType> vertices(meshData.Vertices.size());
+
+	for (int i = 0; i < meshData.Vertices.size(); ++i)
+	{
+		vertices[i].position = meshData.Vertices[i].Position;
+		vertices[i].normal = meshData.Vertices[i].Normal;
+		vertices[i].textureUV = meshData.Vertices[i].TexC;
+	}
+
+	std::vector<UINT> indices(meshData.Indices);
 
 	D3D11_BUFFER_DESC vbDesc;
 	vbDesc.ByteWidth = sizeof(VertexType) * vertices.size();

@@ -31,11 +31,14 @@ public:
 	virtual void OnMouseDown(WPARAM btnState, int x, int y);
 	virtual void OnMouseUp(WPARAM btnState, int x, int y);
 	virtual void OnMouseMove(WPARAM btnState, int x, int y);
+	virtual void OnMouseWheelMove(WPARAM wParam);
 
 	virtual void ToggleWireframe();
 	virtual void ToggleAutoRotate();
+	virtual void ToggleCameraMode();
 
 	virtual void OnKeyButtonPressed(WPARAM key);
+	virtual void OnKeyButtonReleased(WPARAM key);
 
 protected:
 
@@ -51,6 +54,8 @@ protected:
 	virtual void OnDeviceLost();
 
 	virtual void CalculateFrameStats();
+
+	virtual void UpdateCamera();
 
 	// Rendering loop timer.
 	DX::StepTimer                                   m_timer;
@@ -83,6 +88,9 @@ protected:
 	bool bShowWireframe = false;
 
 	POINT m_lastMousePos;
+	bool bUsingOrbitCamera = false;
+
+	// Free camera
 	float m_theta;
 	float m_phi;
 	float m_radius;
@@ -92,4 +100,19 @@ protected:
 	float m_initCameraY = 2.f;
 	float m_initCameraZ = -5.f;
 	float m_rotateSpeed = DirectX::XMConvertToRadians(45);
+
+	// Orbit camera
+	DirectX::XMVECTOR m_pos;
+	DirectX::XMVECTOR m_target;
+	DirectX::XMVECTOR m_up;
+	DirectX::XMVECTOR m_dir;
+	bool bCameraMoveMode = false;
+	bool bCameraShouldMoveUp = false;
+	bool bCameraShouldMoveDown = false;
+	bool bCameraShouldMoveRight = false;
+	bool bCameraShouldMoveLeft = false;
+	bool bCameraShouldMoveForward = false;
+	bool bCameraShouldMoveBack = false;
+	float m_cameraMoveRate = 10.f;
+	float m_rotateCameraRate = DirectX::XMConvertToRadians(10);
 };

@@ -72,6 +72,17 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilState;
 };
 
+class SkySphere : public SkyBox
+{
+	using Super = SkyBox;
+	friend class SkyGame;
+
+protected:
+
+	virtual void BuildShape() override;
+
+};
+
 class ReflectBox : public Crate
 {
 	using Super = Crate;

@@ -286,6 +286,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 		game->OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		break;
+	case WM_MOUSEWHEEL:
+		game->OnMouseWheelMove(wParam);
+		break;
+	case WM_KEYDOWN:
+		game->OnKeyButtonPressed(wParam);
+		break;
 	case WM_KEYUP:
 		// Key map
 		// https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
@@ -295,7 +301,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-			game->OnKeyButtonPressed(wParam);
+			game->OnKeyButtonReleased(wParam);
 		}
 		break;
     }

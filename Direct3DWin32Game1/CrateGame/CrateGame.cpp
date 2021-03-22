@@ -40,9 +40,9 @@ void CrateGame::Initialize(HWND window, int width, int height)
 	XMStoreFloat4x4(&m_proj, perspectiveMatrix);
 }
 
-void CrateGame::OnKeyButtonPressed(WPARAM key)
+void CrateGame::OnKeyButtonReleased(WPARAM key)
 {
-	Super::OnKeyButtonPressed(key);
+	Super::OnKeyButtonReleased(key);
 
 	if (key == 'T')
 	{
