@@ -14,7 +14,7 @@ void SkyGame::Initialize(HWND window, int width, int height)
 {
 	Super::Initialize(window, width, height);
 
-	if (m_reflectObject->bUsingDynamicCubeMap)
+	if (m_reflectObject && m_reflectObject->bUsingDynamicCubeMap)
 	{
 		BuildDynamicCubeMapViews();
 	}
@@ -43,7 +43,7 @@ void SkyGame::PreObjectsRender()
 {
 	m_d3dContext->VSSetConstantBuffers(0, 1, m_constantBufferPerFrame.GetAddressOf());
 
-	if (m_reflectObject->bUsingDynamicCubeMap)
+	if (m_reflectObject && m_reflectObject->bUsingDynamicCubeMap)
 	{
 		RenderDynamicCubeMapTexture();
 	}
@@ -51,7 +51,7 @@ void SkyGame::PreObjectsRender()
 
 void SkyGame::PostObjectsRender()
 {
-	if (m_reflectObject->bUsingDynamicCubeMap)
+	if (m_reflectObject && m_reflectObject->bUsingDynamicCubeMap)
 	{
 		m_reflectObject->RenderInternal(m_dynamicCubeMapSRV);
 	}
@@ -166,7 +166,7 @@ void SkyGame::RenderDynamicCubeMapTexture()
 
 	XMStoreFloat4x4(&m_view, originalView);
 	XMStoreFloat4x4(&m_proj, originalProj);
-	XMStoreFloat4x4(&m_cbPerFrame.viewProj, XMMatrixTranspose(XMMatrixMultiply(originalView, proj)));
+	XMStoreFloat4x4(&m_cbPerFrame.viewProj, XMMatrixTranspose(XMMatrixMultiply(originalView, originalProj)));
 	d3dUtil::UpdateDynamicBufferFromData(m_d3dContext, m_constantBufferPerFrame, m_cbPerFrame);
 
 	for (auto it = m_objects.begin(); it != m_objects.end(); ++it)

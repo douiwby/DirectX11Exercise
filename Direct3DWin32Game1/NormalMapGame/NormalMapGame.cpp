@@ -4,13 +4,14 @@
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
-using VertexType = VertexPositionNormalTangentUV;
+using VertexType = VertexPositionNormalUVTangent;
 
 void NormalMapGame::Initialize(HWND window, int width, int height)
 {
 	Super::Initialize(window, width, height);
 
-	m_reflectObject->WorldTransform(XMMatrixTranslation(0.f, 30.f, 0.f));
+	if(m_reflectObject)
+		m_reflectObject->WorldTransform(XMMatrixTranslation(0.f, 30.f, 0.f));
 }
 
 void NormalMapGame::OnKeyButtonReleased(WPARAM key)
@@ -18,10 +19,24 @@ void NormalMapGame::OnKeyButtonReleased(WPARAM key)
 	Super::OnKeyButtonReleased(key);
 
 	// Toggle normal map on/off
-	if (key == 'N')
+	if (m_cylinder && key == 'N')
 	{
-		m_cylinder->bDisableNormalMap = !m_cylinder->bDisableNormalMap;
-		m_cylinder->BuildShader();
+		bUsingNormalMap = !bUsingNormalMap;
+		if (bUsingNormalMap)
+		{
+			D3D_SHADER_MACRO defines[] =
+			{
+				"USING_NORMALMAP", "1",
+				NULL, NULL
+			};
+			const std::wstring shaderFilename = L"NormalMapGame\\NormalMap.hlsl";
+			m_cylinder->CreateVSAndPSShader(shaderFilename, shaderFilename, defines);
+		}
+		else
+		{
+			const std::wstring shaderFilename = L"NormalMapGame\\NormalMap.hlsl";
+			m_cylinder->CreateVSAndPSShader(shaderFilename, shaderFilename);
+		}
 	}
 }
 
@@ -65,8 +80,8 @@ void NormalMapShape::SetInputLayout()
 	{
 		{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
 		{"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"TANGENT",0,DXGI_FORMAT_R32G32B32_FLOAT,0,24,D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"TEXUV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"TEXUV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TANGENT",0,DXGI_FORMAT_R32G32B32_FLOAT,0,32,D3D11_INPUT_PER_VERTEX_DATA,0}
 	};
 
 	HRESULT hr = m_d3dDevice->CreateInputLayout(
@@ -81,21 +96,13 @@ void NormalMapShape::SetInputLayout()
 
 void Cylinder::BuildShader()
 {
-	if (bDisableNormalMap)
+	D3D_SHADER_MACRO defines[] =
 	{
-		D3D_SHADER_MACRO defines[] =
-		{
-			"DISABLE_NORMALMAP", "1",
-			NULL, NULL
-		};
-		const std::wstring shaderFilename = L"NormalMapGame\\NormalMap.hlsl";
-		CreateVSAndPSShader(shaderFilename, shaderFilename, defines);
-	}
-	else
-	{
-		const std::wstring shaderFilename = L"NormalMapGame\\NormalMap.hlsl";
-		CreateVSAndPSShader(shaderFilename, shaderFilename);
-	}
+		"USING_NORMALMAP", "1",
+		NULL, NULL
+	};
+	const std::wstring shaderFilename = L"NormalMapGame\\NormalMap.hlsl";
+	CreateVSAndPSShader(shaderFilename, shaderFilename, defines);
 }
 
 void Cylinder::BuildMaterial()

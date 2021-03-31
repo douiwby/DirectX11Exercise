@@ -201,7 +201,7 @@ void CrateGame::BuildCrate()
 	hr = m_d3dDevice->CreateBuffer(&cbDesc, nullptr, m_constantBuffer.GetAddressOf());
 	DX::ThrowIfFailed(hr);
 
-	m_d3dContext->VSSetConstantBuffers(0, 1, m_constantBuffer.GetAddressOf());
+	m_d3dContext->VSSetConstantBuffers(1, 1, m_constantBuffer.GetAddressOf());
 }
 
 void CrateGame::BuildTexture()

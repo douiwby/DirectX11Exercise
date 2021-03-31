@@ -106,3 +106,16 @@ void Shape::UpdateConstantBufferPerObject()
 
 	d3dUtil::UpdateDynamicBufferFromData(m_d3dContext, m_constantBufferPerObject, cbWorldViewProj);
 }
+
+void Shape::SetVSAndPSShader(Microsoft::WRL::ComPtr<ID3D11VertexShader>& VS, Microsoft::WRL::ComPtr<ID3D11PixelShader>& PS)
+{
+	HRESULT hr;
+	if (VS)
+	{
+		m_vertexShader = VS;
+	}
+	if (PS)
+	{
+		m_pixelShader = PS;
+	}
+}

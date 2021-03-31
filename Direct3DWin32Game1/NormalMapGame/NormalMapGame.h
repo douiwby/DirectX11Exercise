@@ -15,7 +15,9 @@ protected:
 
 	virtual void AddObjects() override;
 
-	class Cylinder* m_cylinder;
+	class Cylinder* m_cylinder = nullptr;
+
+	bool bUsingNormalMap = true;
 };
 
 class NormalMapShape : public LitShape
@@ -50,6 +52,4 @@ protected:
 	virtual void BuildShape() override;
 
 	virtual void BuildTexture() override;
-
-	bool bDisableNormalMap = false;
 };

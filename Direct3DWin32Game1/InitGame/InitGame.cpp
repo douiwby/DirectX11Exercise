@@ -38,6 +38,9 @@ void InitGame::Initialize(HWND window, int width, int height)
 	XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovLH(m_fovAngleY, AspectRatio(), m_nearZ, m_farZ);
 	XMStoreFloat4x4(&m_proj, perspectiveMatrix);
 
+	//XMMATRIX orthographicMatrix = XMMatrixOrthographicLH(400.f, 400.f, m_nearZ, m_farZ);
+	//XMStoreFloat4x4(&m_proj, orthographicMatrix);
+
 	m_radius = sqrt(pow(m_initCameraY,2)+pow(m_initCameraZ,2));
 }
 
@@ -364,6 +367,7 @@ void InitGame::Present()
 	// If the device was reset we must completely reinitialize the renderer.
 	if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
 	{
+		HRESULT hr = m_d3dDevice->GetDeviceRemovedReason();
 		OnDeviceLost();
 	}
 	else

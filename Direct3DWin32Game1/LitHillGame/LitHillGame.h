@@ -29,7 +29,7 @@ protected:
 
 	virtual void BuildLight();
 
-	virtual void BuildConstantBuffer();
+	virtual void BuildConstantBuffer();  // Remember to override this if you changed cnPerFrame struct
 
 	virtual void UpdateLightPosition(DX::StepTimer const& timer);
 
@@ -38,7 +38,7 @@ protected:
 	inline void RotateVector(DirectX::XMFLOAT3& vector, DirectX::XMFLOAT4X4& rotation);
 
 	void CreateConstantBufferPerFrame(UINT bufferSize);
-	virtual void UpdateConstantBufferPerFrame();
+	virtual void UpdateConstantBufferPerFrame();  // Remember to override this if you changed cnPerFrame struct
 
 	struct cbPerFrame
 	{

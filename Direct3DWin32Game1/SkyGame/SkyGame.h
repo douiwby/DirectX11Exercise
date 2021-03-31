@@ -35,7 +35,7 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_dynamicCubeMapRTV[6];
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_dynamicCubeMapDSV;
 
-	class ReflectBox* m_reflectObject;
+	class ReflectBox* m_reflectObject = nullptr;
 
 	UINT m_cubeMapSize = 256;
 };

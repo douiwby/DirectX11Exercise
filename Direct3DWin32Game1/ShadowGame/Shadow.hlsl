@@ -1,16 +1,16 @@
-//=============================================================================
-// Lighting.fx by Frank Luna (C) 2011 All Rights Reserved.
-//
-// Transforms and lights geometry.
-//=============================================================================
+//***************************************************************************************
+// Default.hlsl by Frank Luna (C) 2015 All Rights Reserved.
+//***************************************************************************************
 
 #include "..\\LitHillGame\\LightHelper.hlsl"
 
 Texture2D gDiffuseMap : register(t0);
-TextureCube gCubeMap : register(t1);
+//TextureCube gCubeMap : register(t1);
 Texture2D gNormalMap : register(t2);
+Texture2D gShadowMap : register(t3);
 
 SamplerState gSampler : register(s0);
+SamplerComparisonState gsamShadow : register(s1);
 
 cbuffer cbPerFrame : register(b0)
 {
@@ -26,6 +26,8 @@ cbuffer cbPerFrame : register(b0)
 	float2 pad;
 
 	float4x4 gViewProj;
+
+	float4x4 gShadowTransform;
 };
 
 cbuffer cbPerObject : register(b1)
@@ -41,35 +43,49 @@ struct VertexIn
 	float3 PosL  : POSITION;
 	float3 NormalL : NORMAL;
 	float2 TexUV: TEXUV;
+#ifdef USING_NORMALMAP
 	float3 TangentL : TANGENT;
+#endif
 };
 
 struct VertexOut
 {
 	float4 PosH    : SV_POSITION;
-    float3 PosW    : POSITION;
-    float3 NormalW : NORMAL;
+	float4 ShadowPosH : POSITION0;
+	float3 PosW    : POSITION1;
+	float3 NormalW : NORMAL;
+#ifdef USING_NORMALMAP
 	float3 TangentW : TANGENT;
+#endif
 	float2 TexUV: TEXUV;
 };
 
 VertexOut VS(VertexIn vin)
 {
-	VertexOut vout;
-	
-	// Transform to world space space.
-	vout.PosW    = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
-	vout.NormalW = mul(vin.NormalL, (float3x3)gWorldInvTranspose);
-	vout.TangentW = mul(vin.TangentL, (float3x3)gWorld);
+	VertexOut vout = (VertexOut)0.0f;
 		
-	// Transform to homogeneous clip space.
-	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
+    // Transform to world space.
+    float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
+    vout.PosW = posW.xyz;
 
+    // Assumes nonuniform scaling; otherwise, need to use inverse-transpose of world matrix.
+    vout.NormalW = mul(vin.NormalL, (float3x3)gWorld);
+
+#ifdef USING_NORMALMAP
+	vout.TangentW = mul(vin.TangentL, (float3x3)gWorld);
+#endif
+
+    // Transform to homogeneous clip space.
+    vout.PosH = mul(posW, gViewProj);
+	
 	vout.TexUV = vin.TexUV;
 
-	return vout;
+    // Generate projective tex-coords to project shadow map onto scene.
+    vout.ShadowPosH = mul(posW, gShadowTransform);
+	
+    return vout;
 }
-  
+
 float4 PS(VertexOut pin) : SV_Target
 {
 	float4 texColor = gDiffuseMap.Sample(gSampler, pin.TexUV);
@@ -82,7 +98,7 @@ float4 PS(VertexOut pin) : SV_Target
 #endif
 
 	// Interpolating normal can unnormalize it, so normalize it.
-    pin.NormalW = normalize(pin.NormalW); 
+	pin.NormalW = normalize(pin.NormalW);
 
 	float3 bumpedNormalW = pin.NormalW;
 #ifdef USING_NORMALMAP
@@ -99,15 +115,20 @@ float4 PS(VertexOut pin) : SV_Target
 	// Start with a sum of zero. 
 	float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	float4 spec    = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	float4 spec = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Sum the light contribution from each light source.
 	float4 A, D, S;
 
+	float shadow = 1.0f;
+#ifdef ENABLE_SHADOWMAP
+	shadow = CalcShadowFactor(gsamShadow, gShadowMap, pin.ShadowPosH);
+#endif
+
 	ComputeDirectionalLight(gMaterial, gDirLight, bumpedNormalW, toEyeW, A, D, S);
-	ambient += A;  
-	diffuse += D;
-	spec    += S;
+	ambient += A;
+	diffuse += shadow * D;
+	spec    += shadow * S;
 
 	ComputePointLight(gMaterial, gPointLight, pin.PosW, bumpedNormalW, toEyeW, A, D, S);
 	ambient += A;
@@ -116,9 +137,9 @@ float4 PS(VertexOut pin) : SV_Target
 
 	ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, bumpedNormalW, toEyeW, A, D, S);
 	ambient += A;
-	diffuse += D;
-	spec    += S;
-	
+	diffuse += shadow * D;
+	spec    += shadow * S;
+
 	float4 litColor = texColor * (ambient + diffuse) + spec;
 	//litColor = texColor;
 
@@ -139,5 +160,7 @@ float4 PS(VertexOut pin) : SV_Target
 	// Common to take alpha from diffuse material.
 	litColor.a = gMaterial.Diffuse.a;
 
-    return litColor;
+	return litColor;
 }
+
+

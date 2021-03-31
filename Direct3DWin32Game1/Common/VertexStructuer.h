@@ -22,10 +22,10 @@ struct VertexPositionNormalUV
 	DirectX::XMFLOAT2 textureUV;
 };
 
-struct VertexPositionNormalTangentUV
+struct VertexPositionNormalUVTangent
 {
 	DirectX::XMFLOAT3 position;
 	DirectX::XMFLOAT3 normal;
-	DirectX::XMFLOAT3 tangent;
 	DirectX::XMFLOAT2 textureUV;
+	DirectX::XMFLOAT3 tangent;
 };

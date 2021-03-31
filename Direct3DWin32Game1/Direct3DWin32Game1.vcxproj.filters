@@ -59,6 +59,9 @@
     <Filter Include="NormalMapGame">
       <UniqueIdentifier>{50a43073-5916-43cc-9a51-6664a002a27a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ShadowGame">
+      <UniqueIdentifier>{e80be001-5688-4a86-92af-08fb7bd4d3ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -135,6 +138,9 @@
     <ClInclude Include="Common\GeometryGenerator.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowGame\ShadowGame.h">
+      <Filter>ShadowGame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -205,6 +211,9 @@
     <ClCompile Include="Common\GeometryGenerator.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowGame\ShadowGame.cpp">
+      <Filter>ShadowGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -264,6 +273,12 @@
     </FxCompile>
     <FxCompile Include="NormalMapGame\NormalMap.hlsl">
       <Filter>NormalMapGame</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowGame\ShadowMapQuad.hlsl">
+      <Filter>ShadowGame</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowGame\Shadow.hlsl">
+      <Filter>ShadowGame</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

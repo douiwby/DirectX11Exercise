@@ -7,7 +7,7 @@
 Texture2D    gDiffuseMap : register(t0);
 SamplerState gsamLinear : register(s0);
 
-cbuffer cbPerObject : register(b0)
+cbuffer cbPerObject : register(b1)
 {
 	float4x4 gWorldViewProj; 
 };

@@ -18,6 +18,10 @@ public:
 
 	virtual void UpdateConstantBufferPerObject();
 
+	void SetVSAndPSShader(Microsoft::WRL::ComPtr<ID3D11VertexShader>& VS, Microsoft::WRL::ComPtr<ID3D11PixelShader>& PS);
+	Microsoft::WRL::ComPtr<ID3D11VertexShader>& GetVSShader() { return m_vertexShader; }
+	Microsoft::WRL::ComPtr<ID3D11PixelShader>& GetPSShader() { return m_pixelShader; }
+
 protected:
 
 	virtual void BuildShader();
@@ -28,6 +32,7 @@ protected:
 	Microsoft::WRL::ComPtr<ID3DBlob> m_VSByteCode;
 	Microsoft::WRL::ComPtr<ID3DBlob> m_PSByteCode;
 
-	void CreateVSAndPSShader(const std::wstring& vsFilename, const std::wstring& psFilename, const D3D_SHADER_MACRO* defines = nullptr);
 	void CreateConstantBufferPerObject(UINT bufferSize);
+
+	void CreateVSAndPSShader(const std::wstring& vsFilename, const std::wstring& psFilename, const D3D_SHADER_MACRO* defines = nullptr);
 };

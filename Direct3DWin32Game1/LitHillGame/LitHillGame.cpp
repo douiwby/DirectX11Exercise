@@ -106,15 +106,26 @@ void LitHillGame::UpdateLightPosition(DX::StepTimer const & timer)
 		{
 			m_spotLight.Position.x -= movingSpeed * elapsedTime;
 		}
-
 		if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+		{
 			m_spotLight.Position.x += movingSpeed * elapsedTime;
-
+		}
 		if (GetAsyncKeyState(VK_UP) & 0x8000)
+		{
 			m_spotLight.Position.z += movingSpeed * elapsedTime;
-
+		}
 		if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+		{
 			m_spotLight.Position.z -= movingSpeed * elapsedTime;
+		}
+		if (GetAsyncKeyState('E') & 0x8000)
+		{
+			m_spotLight.Position.y += movingSpeed * elapsedTime;
+		}
+		if (GetAsyncKeyState('Q') & 0x8000)
+		{
+			m_spotLight.Position.y -= movingSpeed * elapsedTime;
+		}
 
 		float rotateSpeed = 45.f / 180.f * XM_PI;
 		if (GetAsyncKeyState('A') & 0x8000)  // A key
